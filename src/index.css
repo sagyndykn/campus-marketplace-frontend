@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+:root {
+  --primary: #082673;
+  --accent: #9e2629;
+  --text: #414141;
+  --bg-light: #e8ecf8;
+  --border: #d1d5db;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #fff;
+  transition: background-color 0.15s;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--accent);
+}
+
+.btn-outline-accent {
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  background-color: transparent;
+  transition: background-color 0.15s;
+}
+.btn-outline-accent:hover {
+  background-color: #fdf2f2;
+}
+
+.btn-back {
+  color: var(--text);
+  transition: color 0.15s;
+}
+.btn-back:hover {
+  color: var(--accent);
+}
+
+.btn-link {
+  color: var(--primary);
+  transition: color 0.15s;
+}
+.btn-link:hover {
+  color: var(--accent);
+}
+
+.input-field {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  outline: none;
+  transition: border-color 0.15s;
+  background-color: #fff;
+}
+.input-field:focus {
+  border-color: var(--primary);
+}
+.input-field:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.input-field-sm {
+  padding: 0.5rem 0.75rem;
+}
