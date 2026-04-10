@@ -1,122 +1,91 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { MarketProvider } from './context/MarketContext';
+import Layout from './components/Layout';
+import { logout as apiLogout } from './api/auth';
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+import AuthPage from './pages/auth/AuthPage';
+import OtpPage from './pages/auth/OtpPage';
+import Index from './pages/Index';
+import Wishlist from './pages/Wishlist';
+import AddListing from './pages/AddListing';
+import Chat from './pages/Chat';
+import ChatDialog from './pages/ChatDialog';
+import Profile from './pages/Profile';
 
-      <div className="ticks"></div>
-      <h1 className="text-3xl font-bold text-blue-500">Hello Tailwind!</h1>
+function AuthFlow({ onLogin }) {
+  const [view, setView] = useState('auth');
+  const [pendingEmail, setPendingEmail] = useState('');
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+  const handleOtpSent = (email) => {
+    setPendingEmail(email);
+    setView('otp');
+  };
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+  const handleOtpSuccess = (res) => {
+    onLogin({ email: res.email, role: res.role });
+  };
+
+  if (view === 'otp') {
+    return <OtpPage email={pendingEmail} onSuccess={handleOtpSuccess} onBack={() => setView('auth')} />;
+  }
+  return <AuthPage onOtpSent={handleOtpSent} onLogin={onLogin} />;
 }
 
-export default App
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const saved = localStorage.getItem('user');
+    if (token && saved) {
+      setUser(JSON.parse(saved));
+    }
+    setChecked(true);
+  }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    const token = localStorage.getItem('token');
+    if (token) apiLogout(token).catch(() => {});
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+  if (!checked) return null;
+
+  if (!user) {
+    return (
+      <>
+        <AuthFlow onLogin={handleLogin} />
+        <Toaster position="top-center" richColors />
+      </>
+    );
+  }
+
+  return (
+    <MarketProvider>
+      <BrowserRouter>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/add" element={<AddListing />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/chat/:id" element={<ChatDialog />} />
+            <Route path="/profile" element={<Profile onLogout={handleLogout} />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Layout>
+        <Toaster position="top-center" richColors />
+      </BrowserRouter>
+    </MarketProvider>
+  );
+}
