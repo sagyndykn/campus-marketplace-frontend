@@ -50,7 +50,7 @@ jobs:
       - name: Deploy via rsync over SSH
         uses: burnett01/rsync-deployments@7.0.1
         with:
-          switches: -avzr --delete --omit-dir-times
+          switches: -rltzD --delete --omit-dir-times --no-perms
           path: dist/
           remote_path: ${{ secrets.SERVER_PATH }}
           remote_host: ${{ secrets.SERVER_HOST }}
