@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 const authHeaders = (json = true) => {
   const h = { Authorization: `Bearer ${localStorage.getItem('token')}` };
