@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 import { X, Heart, MessageCircle, Loader } from 'lucide-react';
 import { useMarket } from '../context/MarketContext';
 import { getListings } from '../api/listings';
+import { startConversation } from '../api/chat';
 import { CATEGORY_LABELS } from '../data/listings';
 import { toast } from 'sonner';
 
@@ -10,7 +12,7 @@ const SWIPE_THRESHOLD = 100;
 const FEED_SIZE = 50;
 const MAX_DOTS = 10;
 
-function ListingCard({ listing, onSwipe, isTop }) {
+function ListingCard({ listing, onSwipe, isTop, onChat }) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-18, 18]);
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
@@ -84,7 +86,9 @@ function ListingCard({ listing, onSwipe, isTop }) {
                 {listing.sellerName || 'Аноним'}
               </span>
             </div>
-            <button className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-medium"
+            <button
+              onClick={(e) => { e.stopPropagation(); onChat(listing); }}
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-medium"
               style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}>
               <MessageCircle size={13} /> Написать
             </button>
@@ -96,6 +100,7 @@ function ListingCard({ listing, onSwipe, isTop }) {
 }
 
 export default function Index() {
+  const navigate = useNavigate();
   const { addToWishlist } = useMarket();
   const [listings, setListings] = useState([]);
   const [index, setIndex] = useState(0);
@@ -115,6 +120,15 @@ export default function Index() {
       toast.success('Добавлено в вишлист', { duration: 1500 });
     }
     setIndex((i) => i + 1);
+  };
+
+  const handleChat = async (listing) => {
+    try {
+      const conv = await startConversation(listing.sellerId, listing.id);
+      navigate(`/chat/${conv.id}`, { state: { otherUserId: conv.otherUserId, otherUserName: conv.otherUserName } });
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   if (loading) {
@@ -170,6 +184,7 @@ export default function Index() {
                 listing={listing}
                 isTop={i === remaining.slice(0, 2).length - 1}
                 onSwipe={handleSwipe}
+                onChat={handleChat}
               />
             ))
           ) : (

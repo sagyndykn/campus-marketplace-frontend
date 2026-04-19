@@ -25,7 +25,7 @@ function AuthFlow({ onLogin }) {
   };
 
   const handleOtpSuccess = (res) => {
-    onLogin({ email: res.email, role: res.role });
+    onLogin(res);
   };
 
   if (view === 'otp') {
@@ -48,6 +48,7 @@ export default function App() {
   }, []);
 
   const handleLogin = (userData) => {
+    localStorage.setItem('user', JSON.stringify({ id: userData.id, email: userData.email, role: userData.role }));
     setUser(userData);
   };
 
