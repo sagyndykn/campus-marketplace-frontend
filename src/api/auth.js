@@ -24,8 +24,13 @@ export const register = (data) => request('/auth/register', data);
 export const login = (data) => request('/auth/login', data);
 export const verifyOtp = (data) => request('/auth/verify-otp', data);
 export const resendOtp = (data) => request('/auth/resend-otp', data);
-export const logout = (token) =>
+
+export const logout = (accessToken, refreshToken) =>
   fetch(`${BASE_URL}/auth/logout`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refreshToken }),
   });
