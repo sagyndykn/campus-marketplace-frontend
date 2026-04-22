@@ -23,6 +23,7 @@ export default function AuthPage({ onOtpSent, onLogin }) {
       } else {
         const res = await login({ email: form.email, password: form.password });
         localStorage.setItem('token', res.token);
+        localStorage.setItem('refreshToken', res.refreshToken);
         localStorage.setItem('user', JSON.stringify({ email: res.email, role: res.role }));
         onLogin(res);
       }

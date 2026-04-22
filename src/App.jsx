@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 
 import { MarketProvider } from './context/MarketContext';
 import Layout from './components/Layout';
 import { logout as apiLogout } from './api/auth';
+import { isTokenExpired } from './api/client';
 
 import AuthPage from './pages/auth/AuthPage';
 import OtpPage from './pages/auth/OtpPage';
@@ -40,9 +41,19 @@ export default function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const refreshToken = localStorage.getItem('refreshToken');
     const saved = localStorage.getItem('user');
-    if (token && saved) {
+
+    if (saved && refreshToken) {
+      // Есть refresh token — пользователь остаётся залогиненным.
+      // Если access token истёк, первый API-запрос тихо обновит его.
       setUser(JSON.parse(saved));
+    } else if (saved && token && !isTokenExpired(token)) {
+      setUser(JSON.parse(saved));
+    } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
     }
     setChecked(true);
   }, []);
@@ -54,11 +65,22 @@ export default function App() {
 
   const handleLogout = () => {
     const token = localStorage.getItem('token');
-    if (token) apiLogout(token).catch(() => {});
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (token) apiLogout(token, refreshToken).catch(() => {});
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     setUser(null);
   };
+
+  useEffect(() => {
+    const onExpired = () => {
+      handleLogout();
+      toast.error('Сессия истекла. Войдите снова.');
+    };
+    window.addEventListener('auth:expired', onExpired);
+    return () => window.removeEventListener('auth:expired', onExpired);
+  }, []);
 
   if (!checked) return null;
 

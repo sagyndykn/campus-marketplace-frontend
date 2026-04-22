@@ -52,6 +52,7 @@ export default function OtpPage({ email, onSuccess, onBack }) {
     try {
       const res = await verifyOtp({ email, otp: code });
       localStorage.setItem('token', res.token);
+      localStorage.setItem('refreshToken', res.refreshToken);
       localStorage.setItem('user', JSON.stringify({ email: res.email, role: res.role }));
       onSuccess(res);
     } catch (err) {

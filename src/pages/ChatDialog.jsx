@@ -194,14 +194,14 @@ export default function ChatDialog() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="fixed inset-x-0 top-0 bottom-20 md:top-16 md:bottom-0 flex items-center justify-center bg-white">
         <Loader size={28} className="animate-spin" style={{ color: 'var(--primary)' }} />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen md:h-[calc(100vh-64px)]">
+    <div className="fixed inset-x-0 top-0 bottom-20 md:top-16 md:bottom-0 flex flex-col bg-white">
       <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 shrink-0">
         <button onClick={() => navigate('/chat')}
           className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
