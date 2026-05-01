@@ -17,3 +17,8 @@ export const createListing = (data) => request('POST', '/listings', data);
 export const updateListing = (id, data) => request('PUT', `/listings/${id}`, data);
 export const deleteListing = (id) => request('DELETE', `/listings/${id}`);
 export const uploadListingPhotos = (id, files) => uploadFiles(`/listings/${id}/photos`, files);
+
+export const getFavorites = () => request('GET', '/listings/favorites');
+export const addFavorite = (id) => request('POST', `/listings/${id}/favorite`);
+export const removeFavorite = (id) => request('DELETE', `/listings/${id}/favorite`);
+export const clearFavorites = () => request('DELETE', '/listings/favorites');
