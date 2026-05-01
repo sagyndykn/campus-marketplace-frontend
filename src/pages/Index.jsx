@@ -1,223 +1,214 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
-import { X, Heart, MessageCircle, Loader } from 'lucide-react';
 import { useMarket } from '../context/MarketContext';
-import { getListings } from '../api/listings';
+import { getListings, addFavorite, removeFavorite, getFavorites } from '../api/listings';
 import { startConversation } from '../api/chat';
-import { CATEGORY_LABELS } from '../data/listings';
 import { toast } from 'sonner';
 
-const SWIPE_THRESHOLD = 100;
+import FeedHeader from '../components/feed/FeedHeader';
+import FiltersModal from '../components/feed/FiltersModal';
+import FeedSkeletonLoader from '../components/feed/FeedSkeletonLoader';
+import ListingGrid from '../components/listings/ListingGrid';
+import ListingList from '../components/listings/ListingList';
+import ListingTileGrid from '../components/listings/ListingTileGrid';
+import ListingSwipe from '../components/listings/ListingSwipe';
+
 const FEED_SIZE = 50;
-const MAX_DOTS = 10;
+const DEBOUNCE_MS = 300;
+const VIEW_MODE_KEY = 'feed_view_mode';
+const EMPTY_FILTERS = { minPrice: '', maxPrice: '', onlyWithPhoto: false };
 
-function ListingCard({ listing, onSwipe, isTop, onChat }) {
-  const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 200], [-18, 18]);
-  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
-  const likeOpacity = useTransform(x, [0, 80], [0, 1]);
-  const nopeOpacity = useTransform(x, [-80, 0], [1, 0]);
+function normalizeSearch(str) {
+  return str.toLowerCase().trim();
+}
 
-  const handleDragEnd = (_, info) => {
-    if (info.offset.x > SWIPE_THRESHOLD) onSwipe('right');
-    else if (info.offset.x < -SWIPE_THRESHOLD) onSwipe('left');
-  };
-
+function matchesSearch(listing, query) {
+  if (!query) return true;
+  const q = normalizeSearch(query);
   return (
-    <motion.div
-      className="absolute w-full"
-      style={{ x, rotate, opacity }}
-      drag={isTop ? 'x' : false}
-      dragConstraints={{ left: 0, right: 0 }}
-      onDragEnd={handleDragEnd}
-      whileDrag={{ scale: 1.02, cursor: 'grabbing' }}
-      initial={{ scale: isTop ? 1 : 0.96, y: isTop ? 0 : 12 }}
-    >
-      {isTop && (
-        <>
-          <motion.div className="absolute top-6 left-6 z-10 border-4 rounded-lg px-3 py-1 font-bold text-lg rotate-[-12deg]"
-            style={{ opacity: likeOpacity, borderColor: 'var(--primary)', color: 'var(--primary)' }}>
-            ЛАЙК
-          </motion.div>
-          <motion.div className="absolute top-6 right-6 z-10 border-4 rounded-lg px-3 py-1 font-bold text-lg rotate-[12deg]"
-            style={{ opacity: nopeOpacity, borderColor: 'var(--accent)', color: 'var(--accent)' }}>
-            ПРОПУСК
-          </motion.div>
-        </>
-      )}
-
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden select-none" style={{ height: 460 }}>
-        <div className="flex items-center justify-center" style={{ height: 260, backgroundColor: 'var(--bg-light)' }}>
-          {listing.photoUrls?.length > 0 ? (
-            <img src={listing.photoUrls[0]} alt={listing.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-20 h-20 rounded-2xl bg-white opacity-50" />
-          )}
-        </div>
-
-        <div className="p-4">
-          <div className="flex items-start justify-between mb-2">
-            <div className="flex-1">
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}>
-                {CATEGORY_LABELS[listing.category] || listing.category}
-              </span>
-              <h3 className="text-lg font-bold mt-2 line-clamp-1" style={{ color: 'var(--primary)' }}>
-                {listing.title}
-              </h3>
-            </div>
-            <span className="text-lg font-bold ml-2 shrink-0" style={{ color: 'var(--accent)' }}>
-              {listing.price?.toLocaleString('ru-RU')} ₸
-            </span>
-          </div>
-          <p className="text-sm text-gray-400 line-clamp-2 mb-3">{listing.description}</p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {listing.sellerAvatarUrl ? (
-                <img src={listing.sellerAvatarUrl} className="w-7 h-7 rounded-full object-cover" alt="" />
-              ) : (
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                  style={{ backgroundColor: 'var(--accent)' }}>
-                  {(listing.sellerName || '?')[0].toUpperCase()}
-                </div>
-              )}
-              <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>
-                {listing.sellerName || 'Аноним'}
-              </span>
-            </div>
-            <button
-              onClick={(e) => { e.stopPropagation(); onChat(listing); }}
-              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-medium"
-              style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}>
-              <MessageCircle size={13} /> Написать
-            </button>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+    normalizeSearch(listing.title || '').includes(q) ||
+    normalizeSearch(listing.description || '').includes(q)
   );
+}
+
+function sortListings(listings, sort) {
+  if (!sort || sort === 'recommended') return listings;
+  const sorted = [...listings];
+  if (sort === 'newest') sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  else if (sort === 'cheapest') sorted.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+  else if (sort === 'expensive') sorted.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+  return sorted;
+}
+
+function readViewMode() {
+  const raw = localStorage.getItem(VIEW_MODE_KEY);
+  if (raw === 'grid') return 'gallery'; // migrate old value
+  return raw || 'gallery';
 }
 
 export default function Index() {
   const navigate = useNavigate();
   const { addToWishlist } = useMarket();
+
   const [listings, setListings] = useState([]);
-  const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [favoritedIds, setFavoritedIds] = useState(new Set());
+  const [swipeIndex, setSwipeIndex] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [category, setCategory] = useState('');
+  const [sort, setSort] = useState('recommended');
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+
+  const [viewMode, setViewMode] = useState(readViewMode);
 
   useEffect(() => {
-    getListings({ size: FEED_SIZE })
+    const t = setTimeout(() => setDebouncedSearch(search), DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  useEffect(() => {
+    setLoading(true);
+    setSwipeIndex(0);
+    const params = { size: FEED_SIZE };
+    if (debouncedSearch) params.search = debouncedSearch;
+    if (category) params.category = category;
+    if (filters.minPrice !== '') params.minPrice = Number(filters.minPrice);
+    if (filters.maxPrice !== '') params.maxPrice = Number(filters.maxPrice);
+    getListings(params)
       .then((page) => setListings(page.content || []))
-      .catch((err) => setError(err.message))
+      .catch((err) => toast.error(err.message))
       .finally(() => setLoading(false));
+  }, [debouncedSearch, category, filters]);
+
+  useEffect(() => {
+    getFavorites()
+      .then((favs) => setFavoritedIds(new Set((favs || []).map((l) => l.id))))
+      .catch(() => {});
   }, []);
 
-  const handleSwipe = (direction) => {
-    if (direction === 'right') {
-      addToWishlist(listings[index]);
-      toast.success('Добавлено в вишлист', { duration: 1500 });
-    }
-    setIndex((i) => i + 1);
-  };
+  const handleViewModeChange = useCallback((mode) => {
+    setViewMode(mode);
+    localStorage.setItem(VIEW_MODE_KEY, mode);
+    if (mode === 'swipe') setSwipeIndex(0);
+  }, []);
 
-  const handleChat = async (listing) => {
+  const displayedListings = useMemo(() => {
+    let result = listings;
+    if (debouncedSearch) result = result.filter((l) => matchesSearch(l, debouncedSearch));
+    if (filters.onlyWithPhoto) result = result.filter((l) => l.photoUrls?.length > 0);
+    return sortListings(result, sort);
+  }, [listings, debouncedSearch, sort, filters.onlyWithPhoto]);
+
+  const hasActiveFilters = filters.minPrice !== '' || filters.maxPrice !== '' || filters.onlyWithPhoto;
+
+  const handleToggleFavorite = useCallback(async (listing) => {
+    const wasFav = favoritedIds.has(listing.id);
+    setFavoritedIds((prev) => {
+      const next = new Set(prev);
+      wasFav ? next.delete(listing.id) : next.add(listing.id);
+      return next;
+    });
+    try {
+      if (wasFav) await removeFavorite(listing.id);
+      else await addFavorite(listing.id);
+    } catch {
+      setFavoritedIds((prev) => {
+        const next = new Set(prev);
+        wasFav ? next.add(listing.id) : next.delete(listing.id);
+        return next;
+      });
+      toast.error('Не удалось обновить избранное');
+    }
+  }, [favoritedIds]);
+
+  const handleSwipe = useCallback((direction) => {
+    if (direction === 'right') {
+      const listing = displayedListings[swipeIndex];
+      if (listing) {
+        addToWishlist(listing);
+        if (!favoritedIds.has(listing.id)) {
+          handleToggleFavorite(listing);
+        }
+        toast.success('Добавлено в избранное', { duration: 1500 });
+      }
+    }
+    setSwipeIndex((i) => i + 1);
+  }, [displayedListings, swipeIndex, favoritedIds, addToWishlist, handleToggleFavorite]);
+
+  const handleChat = useCallback(async (listing) => {
     try {
       const conv = await startConversation(listing.sellerId, listing.id);
       navigate(`/chat/${conv.id}`, { state: { otherUserId: conv.otherUserId, otherUserName: conv.otherUserName } });
     } catch (err) {
       toast.error(err.message);
     }
+  }, [navigate]);
+
+  const renderContent = () => {
+    if (loading) return <FeedSkeletonLoader viewMode={viewMode} />;
+
+    if (displayedListings.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-24 gap-2">
+          <p className="text-lg font-bold" style={{ color: 'var(--primary)' }}>Ничего не найдено</p>
+          <p className="text-sm text-gray-400">Попробуйте изменить фильтры или поисковый запрос</p>
+        </div>
+      );
+    }
+
+    const sharedProps = {
+      items: displayedListings,
+      favoritedIds,
+      onFavoriteToggle: handleToggleFavorite,
+      onChat: handleChat,
+    };
+
+    if (viewMode === 'swipe') {
+      return (
+        <ListingSwipe
+          listings={displayedListings}
+          swipeIndex={swipeIndex}
+          onSwipe={handleSwipe}
+          onChat={handleChat}
+          onReset={() => setSwipeIndex(0)}
+        />
+      );
+    }
+    if (viewMode === 'list') return <ListingList {...sharedProps} />;
+    if (viewMode === 'tile') return <ListingTileGrid {...sharedProps} />;
+    return <ListingGrid {...sharedProps} />;
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-32 gap-3">
-        <Loader size={32} className="animate-spin" style={{ color: 'var(--primary)' }} />
-        <p className="text-sm text-gray-400">Загружаем объявления...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-32 gap-3">
-        <p className="text-sm font-medium" style={{ color: 'var(--accent)' }}>{error}</p>
-        <button onClick={() => window.location.reload()}
-          className="btn-primary px-4 py-2 rounded-lg text-sm">
-          Повторить
-        </button>
-      </div>
-    );
-  }
-
-  if (listings.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-32 gap-3">
-        <p className="text-lg font-bold" style={{ color: 'var(--primary)' }}>Объявлений пока нет</p>
-      </div>
-    );
-  }
-
-  const remaining = listings.slice(index);
-  const dots = Math.min(listings.length, MAX_DOTS);
-
   return (
-    <div className="max-w-sm mx-auto px-4 py-6">
-      <div className="flex justify-center gap-1.5 mb-6">
-        {Array.from({ length: dots }).map((_, i) => (
-          <div key={i} className="h-1.5 rounded-full transition-all duration-300"
-            style={{
-              width: i === Math.min(index, dots - 1) ? 24 : 8,
-              backgroundColor: i <= index ? 'var(--primary)' : '#d1d5db',
-            }} />
-        ))}
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
+      <FeedHeader
+        search={search}
+        onSearchChange={setSearch}
+        category={category}
+        onCategoryChange={setCategory}
+        sort={sort}
+        onSortChange={setSort}
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
+        onFiltersOpen={() => setFiltersOpen(true)}
+        resultCount={displayedListings.length}
+        loading={loading}
+        hasActiveFilters={hasActiveFilters}
+      />
+
+      <div className={viewMode === 'swipe' ? '' : 'max-w-7xl mx-auto px-4 py-4 pb-24 md:pb-8'}>
+        {renderContent()}
       </div>
 
-      <div className="relative" style={{ height: 460 }}>
-        <AnimatePresence>
-          {remaining.length > 0 ? (
-            remaining.slice(0, 2).reverse().map((listing, i) => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
-                isTop={i === remaining.slice(0, 2).length - 1}
-                onSwipe={handleSwipe}
-                onChat={handleChat}
-              />
-            ))
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-2xl shadow-lg gap-3"
-            >
-              <p className="text-xl font-bold" style={{ color: 'var(--primary)' }}>Всё просмотрено!</p>
-              <p className="text-gray-400 text-sm">Вы просмотрели все объявления</p>
-              <button onClick={() => setIndex(0)}
-                className="btn-primary px-6 py-2.5 rounded-lg font-medium mt-2">
-                Смотреть снова
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {remaining.length > 0 && (
-        <div className="flex justify-center gap-6 mt-6">
-          <button onClick={() => handleSwipe('left')}
-            className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-            style={{ border: '2px solid #fee2e2' }}>
-            <X size={24} style={{ color: 'var(--accent)' }} />
-          </button>
-          <button onClick={() => handleSwipe('right')}
-            className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-            style={{ border: '2px solid var(--bg-light)' }}>
-            <Heart size={24} style={{ color: 'var(--primary)' }} />
-          </button>
-        </div>
-      )}
+      <FiltersModal
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        filters={filters}
+        onApply={setFilters}
+      />
     </div>
   );
 }
