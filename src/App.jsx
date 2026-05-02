@@ -6,6 +6,7 @@ import { MarketProvider } from './context/MarketContext';
 import Layout from './components/Layout';
 import { logout as apiLogout } from './api/auth';
 import { isTokenExpired } from './api/client';
+import { useTheme } from './hooks/useTheme';
 
 import AuthPage from './pages/auth/AuthPage';
 import OtpPage from './pages/auth/OtpPage';
@@ -48,6 +49,8 @@ function AuthFlow({ onLogin, onResetVerified }) {
 }
 
 export default function App() {
+  useTheme();
+
   const [user, setUser] = useState(null);
   const [checked, setChecked] = useState(false);
   const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
