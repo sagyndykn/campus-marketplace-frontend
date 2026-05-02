@@ -7,6 +7,7 @@ export const CATEGORY_LABELS = {
   BOOKS: 'Книги',
   GAMES: 'Игры',
   OTHER: 'Другое',
+  SDU: 'SDU',
 };
 
 export const CATEGORY_VALUES = Object.keys(CATEGORY_LABELS);
