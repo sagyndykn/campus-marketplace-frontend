@@ -6,6 +6,9 @@
     "profile": "Профиль",
     "add": "+ Добавить"
   },
+  "common": {
+    "back": "Назад"
+  },
   "auth": {
     "login": "Войти",
     "register": "Регистрация",
@@ -156,6 +159,17 @@
     "presenceYesterday": "был(а) вчера в {{time}}",
     "presenceDate": "был(а) {{date}} в {{time}}",
     "presenceOffline": "не в сети"
+  },
+  "listingDetails": {
+    "authorListings": "Все объявления автора",
+    "similarListings": "Похожие объявления",
+    "viewAll": "Смотреть все",
+    "noPhoto": "Нет фото"
+  },
+  "pagination": {
+    "label": "Пагинация",
+    "previous": "Предыдущая страница",
+    "next": "Следующая страница"
   },
   "categories": {
     "ELECTRONICS": "Электроника",

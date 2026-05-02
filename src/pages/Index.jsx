@@ -13,8 +13,9 @@ import ListingGrid from '../components/listings/ListingGrid';
 import ListingList from '../components/listings/ListingList';
 import ListingTileGrid from '../components/listings/ListingTileGrid';
 import ListingSwipe from '../components/listings/ListingSwipe';
+import Pagination from '../components/common/Pagination';
 
-const FEED_SIZE = 50;
+const PAGE_SIZE = 20;
 const DEBOUNCE_MS = 300;
 const VIEW_MODE_KEY = 'feed_view_mode';
 const EMPTY_FILTERS = { minPrice: '', maxPrice: '', onlyWithPhoto: false };
@@ -56,6 +57,8 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [favoritedIds, setFavoritedIds] = useState(new Set());
   const [swipeIndex, setSwipeIndex] = useState(0);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [search, setSearch] = useState('');
@@ -72,18 +75,39 @@ export default function Index() {
   }, [search]);
 
   useEffect(() => {
+    if (viewMode !== 'swipe') return;
+    const prevBody = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevBody;
+      document.documentElement.style.overflow = prevHtml;
+    };
+  }, [viewMode]);
+
+  useEffect(() => {
+    setPage(0);
+    setSwipeIndex(0);
+  }, [debouncedSearch, category, filters.minPrice, filters.maxPrice, filters.onlyWithPhoto]);
+
+  useEffect(() => {
     setLoading(true);
     setSwipeIndex(0);
-    const params = { size: FEED_SIZE };
+    const params = { page, size: PAGE_SIZE };
     if (debouncedSearch) params.search = debouncedSearch;
     if (category) params.category = category;
     if (filters.minPrice !== '') params.minPrice = Number(filters.minPrice);
     if (filters.maxPrice !== '') params.maxPrice = Number(filters.maxPrice);
     getListings(params)
-      .then((page) => setListings(page.content || []))
+      .then((response) => {
+        const content = response.content || [];
+        setListings(content);
+        setTotalPages(Math.max(response.totalPages || 1, 1));
+      })
       .catch((err) => toast.error(err.message))
       .finally(() => setLoading(false));
-  }, [debouncedSearch, category, filters]);
+  }, [debouncedSearch, category, filters.minPrice, filters.maxPrice, page]);
 
   useEffect(() => {
     getFavorites()
@@ -96,6 +120,18 @@ export default function Index() {
     localStorage.setItem(VIEW_MODE_KEY, mode);
     if (mode === 'swipe') setSwipeIndex(0);
   }, []);
+
+  const handlePageChange = useCallback((nextPage) => {
+    const safePage = Math.min(Math.max(nextPage, 0), totalPages - 1);
+    if (safePage === page) return;
+
+    setPage(safePage);
+    setSwipeIndex(0);
+
+    if (viewMode !== 'swipe') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [page, totalPages, viewMode]);
 
   const displayedListings = useMemo(() => {
     let result = listings;
@@ -137,8 +173,13 @@ export default function Index() {
         toast.success(t('wishlist.added'), { duration: 1500 });
       }
     }
-    setSwipeIndex((i) => i + 1);
-  }, [displayedListings, swipeIndex, favoritedIds, addToWishlist, handleToggleFavorite, t]);
+    const nextIndex = swipeIndex + 1;
+    if (nextIndex >= displayedListings.length && page < totalPages - 1) {
+      setPage((currentPage) => Math.min(currentPage + 1, totalPages - 1));
+    } else {
+      setSwipeIndex(nextIndex);
+    }
+  }, [displayedListings, swipeIndex, page, totalPages, favoritedIds, addToWishlist, handleToggleFavorite, t]);
 
   const handleChat = useCallback(async (listing) => {
     try {
@@ -203,6 +244,9 @@ export default function Index() {
 
       <div className={viewMode === 'swipe' ? '' : 'max-w-7xl mx-auto px-4 py-4 pb-24 md:pb-8'}>
         {renderContent()}
+        {!loading && viewMode !== 'swipe' && (
+          <Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+        )}
       </div>
 
       <FiltersModal

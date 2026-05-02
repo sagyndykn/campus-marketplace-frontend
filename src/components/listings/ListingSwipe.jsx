@@ -1,32 +1,67 @@
-import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
+import { useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
+import { motion, useMotionValue, useTransform, AnimatePresence, animate } from 'framer-motion';
 import { X, Heart, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { handleListingCardKeyDown, useListingNavigation } from '../../hooks/useListingNavigation';
 
-const SWIPE_THRESHOLD = 100;
-const MAX_DOTS = 10;
+const SWIPE_THRESHOLD = 80;
+const VELOCITY_THRESHOLD = 400;
 
-function SwipeCard({ listing, onSwipe, isTop, onChat }) {
+const SwipeCard = forwardRef(function SwipeCard({ listing, onSwipe, isTop, onChat }, ref) {
   const { t } = useTranslation();
+  const openListing = useListingNavigation(listing);
+  const draggedRef = useRef(false);
+
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-18, 18]);
-  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
-  const likeOpacity = useTransform(x, [0, 80], [0, 1]);
-  const nopeOpacity = useTransform(x, [-80, 0], [1, 0]);
+  const likeOpacity = useTransform(x, [20, 100], [0, 1]);
+  const nopeOpacity = useTransform(x, [-100, -20], [1, 0]);
 
-  const handleDragEnd = (_, info) => {
-    if (info.offset.x > SWIPE_THRESHOLD) onSwipe('right');
-    else if (info.offset.x < -SWIPE_THRESHOLD) onSwipe('left');
+  const flyOff = useCallback(async (direction) => {
+    await animate(x, direction === 'right' ? 650 : -650, {
+      duration: 0.25,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    });
+    onSwipe(direction);
+  }, [x, onSwipe]);
+
+  useImperativeHandle(ref, () => ({ swipe: flyOff }), [flyOff]);
+
+  const handleDrag = (_, info) => {
+    draggedRef.current = Math.abs(info.offset.x) > 6;
+  };
+
+  const handleDragEnd = async (_, info) => {
+    const { offset, velocity } = info;
+    if (offset.x > SWIPE_THRESHOLD || velocity.x > VELOCITY_THRESHOLD) {
+      await flyOff('right');
+    } else if (offset.x < -SWIPE_THRESHOLD || velocity.x < -VELOCITY_THRESHOLD) {
+      await flyOff('left');
+    } else {
+      animate(x, 0, { type: 'spring', stiffness: 400, damping: 30 });
+    }
+  };
+
+  const handleCardClick = () => {
+    if (draggedRef.current) {
+      draggedRef.current = false;
+      return;
+    }
+    openListing();
   };
 
   return (
     <motion.div
-      className="absolute w-full"
-      style={{ x, rotate, opacity }}
+      className="absolute w-full touch-none"
+      style={{ x, rotate }}
       drag={isTop ? 'x' : false}
-      dragConstraints={{ left: 0, right: 0 }}
+      dragConstraints={false}
+      onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      whileDrag={{ scale: 1.02, cursor: 'grabbing' }}
       initial={{ scale: isTop ? 1 : 0.96, y: isTop ? 0 : 12 }}
+      animate={{ scale: isTop ? 1 : 0.96, y: isTop ? 0 : 12 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      whileDrag={{ scale: 1.02, cursor: 'grabbing' }}
     >
       {isTop && (
         <>
@@ -45,7 +80,14 @@ function SwipeCard({ listing, onSwipe, isTop, onChat }) {
         </>
       )}
 
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden select-none" style={{ height: 460 }}>
+      <div
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden select-none cursor-pointer"
+        style={{ height: 460 }}
+        onClick={handleCardClick}
+        onKeyDown={(e) => handleListingCardKeyDown(e, openListing)}
+        role="link"
+        tabIndex={isTop ? 0 : -1}
+      >
         <div className="flex items-center justify-center" style={{ height: 260, backgroundColor: 'var(--bg-light)' }}>
           {listing.photoUrls?.length > 0 ? (
             <img src={listing.photoUrls[0]} alt={listing.title} className="w-full h-full object-cover" />
@@ -87,54 +129,49 @@ function SwipeCard({ listing, onSwipe, isTop, onChat }) {
                 {listing.sellerName || t('listing.anonymous')}
               </span>
             </div>
-            <button
-              onClick={(e) => { e.stopPropagation(); onChat(listing); }}
-              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-medium"
-              style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}
-            >
-              <MessageCircle size={13} /> {t('listing.write')}
-            </button>
+            {onChat && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onChat(listing); }}
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-medium"
+                style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}
+              >
+                <MessageCircle size={13} /> {t('listing.write')}
+              </button>
+            )}
           </div>
         </div>
       </div>
     </motion.div>
   );
-}
+});
 
 export default function ListingSwipe({ listings, swipeIndex, onSwipe, onChat, onReset }) {
   const { t } = useTranslation();
+  const topCardRef = useRef(null);
   const remaining = listings.slice(swipeIndex);
-  const dots = Math.min(listings.length, MAX_DOTS);
 
   return (
-    <div className="max-w-sm mx-auto px-4 py-4">
-      <div className="flex justify-center gap-1.5 mb-6">
-        {Array.from({ length: dots }).map((_, i) => (
-          <div
-            key={i}
-            className="h-1.5 rounded-full transition-all duration-300"
-            style={{
-              width: i === Math.min(swipeIndex, dots - 1) ? 24 : 8,
-              backgroundColor: i <= swipeIndex ? 'var(--primary)' : '#d1d5db',
-            }}
-          />
-        ))}
-      </div>
-
+    <div className="max-w-sm mx-auto px-4 py-4 touch-none overscroll-contain">
       <div className="relative" style={{ height: 460 }}>
         <AnimatePresence>
           {remaining.length > 0 ? (
-            remaining.slice(0, 2).reverse().map((listing, i) => (
-              <SwipeCard
-                key={listing.id}
-                listing={listing}
-                isTop={i === remaining.slice(0, 2).length - 1}
-                onSwipe={onSwipe}
-                onChat={onChat}
-              />
-            ))
+            remaining.slice(0, 2).reverse().map((listing, i) => {
+              const isTopCard = i === remaining.slice(0, 2).length - 1;
+              return (
+                <SwipeCard
+                  key={listing.id}
+                  ref={isTopCard ? topCardRef : null}
+                  listing={listing}
+                  isTop={isTopCard}
+                  onSwipe={onSwipe}
+                  onChat={onChat}
+                />
+              );
+            })
           ) : (
             <motion.div
+              key="empty"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               className="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-2xl shadow-lg gap-3"
@@ -142,6 +179,7 @@ export default function ListingSwipe({ listings, swipeIndex, onSwipe, onChat, on
               <p className="text-xl font-bold" style={{ color: 'var(--primary)' }}>{t('swipe.allViewed')}</p>
               <p className="text-gray-400 text-sm">{t('swipe.viewedAll')}</p>
               <button
+                type="button"
                 onClick={onReset}
                 className="btn-primary px-6 py-2.5 rounded-lg font-medium mt-2"
               >
@@ -155,14 +193,16 @@ export default function ListingSwipe({ listings, swipeIndex, onSwipe, onChat, on
       {remaining.length > 0 && (
         <div className="flex justify-center gap-6 mt-6">
           <button
-            onClick={() => onSwipe('left')}
+            type="button"
+            onClick={() => topCardRef.current?.swipe('left')}
             className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
             style={{ border: '2px solid #fee2e2' }}
           >
             <X size={24} style={{ color: 'var(--accent)' }} />
           </button>
           <button
-            onClick={() => onSwipe('right')}
+            type="button"
+            onClick={() => topCardRef.current?.swipe('right')}
             className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
             style={{ border: '2px solid var(--bg-light)' }}
           >

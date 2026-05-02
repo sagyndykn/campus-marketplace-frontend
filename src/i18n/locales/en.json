@@ -6,6 +6,9 @@
     "profile": "Profile",
     "add": "+ Add"
   },
+  "common": {
+    "back": "Back"
+  },
   "auth": {
     "login": "Login",
     "register": "Register",
@@ -156,6 +159,17 @@
     "presenceYesterday": "last seen yesterday at {{time}}",
     "presenceDate": "last seen {{date}} at {{time}}",
     "presenceOffline": "offline"
+  },
+  "listingDetails": {
+    "authorListings": "All listings by this seller",
+    "similarListings": "Similar listings",
+    "viewAll": "View all",
+    "noPhoto": "No photo"
+  },
+  "pagination": {
+    "label": "Pagination",
+    "previous": "Previous page",
+    "next": "Next page"
   },
   "categories": {
     "ELECTRONICS": "Electronics",

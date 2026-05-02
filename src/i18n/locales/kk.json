@@ -6,6 +6,9 @@
     "profile": "Профиль",
     "add": "+ Қосу"
   },
+  "common": {
+    "back": "Артқа"
+  },
   "auth": {
     "login": "Кіру",
     "register": "Тіркелу",
@@ -156,6 +159,17 @@
     "presenceYesterday": "кеше {{time}} болды",
     "presenceDate": "{{date}} күні {{time}} болды",
     "presenceOffline": "желіден тыс"
+  },
+  "listingDetails": {
+    "authorListings": "Автордың барлық хабарландырулары",
+    "similarListings": "Ұқсас хабарландырулар",
+    "viewAll": "Барлығын көру",
+    "noPhoto": "Фото жоқ"
+  },
+  "pagination": {
+    "label": "Парақтау",
+    "previous": "Алдыңғы бет",
+    "next": "Келесі бет"
   },
   "categories": {
     "ELECTRONICS": "Электроника",

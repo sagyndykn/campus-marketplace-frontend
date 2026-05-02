@@ -1,8 +1,21 @@
 import { request, uploadFiles } from './client';
 
-export const getListings = ({ category, search, minPrice, maxPrice, page = 0, size = 20 } = {}) => {
+export const getListings = ({
+  category,
+  categoryId,
+  sellerId,
+  excludeId,
+  search,
+  minPrice,
+  maxPrice,
+  page = 0,
+  size = 20,
+} = {}) => {
   const params = new URLSearchParams();
   if (category) params.set('category', category);
+  if (categoryId) params.set('categoryId', categoryId);
+  if (sellerId) params.set('sellerId', sellerId);
+  if (excludeId) params.set('excludeId', excludeId);
   if (search) params.set('search', search);
   if (minPrice != null) params.set('minPrice', minPrice);
   if (maxPrice != null) params.set('maxPrice', maxPrice);
