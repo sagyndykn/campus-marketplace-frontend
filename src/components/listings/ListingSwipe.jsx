@@ -1,11 +1,12 @@
 import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 import { X, Heart, MessageCircle } from 'lucide-react';
-import { CATEGORY_LABELS } from '../../data/listings';
+import { useTranslation } from 'react-i18next';
 
 const SWIPE_THRESHOLD = 100;
 const MAX_DOTS = 10;
 
 function SwipeCard({ listing, onSwipe, isTop, onChat }) {
+  const { t } = useTranslation();
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 200], [-18, 18]);
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
@@ -33,18 +34,18 @@ function SwipeCard({ listing, onSwipe, isTop, onChat }) {
             className="absolute top-6 left-6 z-10 border-4 rounded-lg px-3 py-1 font-bold text-lg rotate-[-12deg]"
             style={{ opacity: likeOpacity, borderColor: 'var(--primary)', color: 'var(--primary)' }}
           >
-            ЛАЙК
+            {t('swipe.like')}
           </motion.div>
           <motion.div
             className="absolute top-6 right-6 z-10 border-4 rounded-lg px-3 py-1 font-bold text-lg rotate-[12deg]"
             style={{ opacity: nopeOpacity, borderColor: 'var(--accent)', color: 'var(--accent)' }}
           >
-            ПРОПУСК
+            {t('swipe.skip')}
           </motion.div>
         </>
       )}
 
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden select-none" style={{ height: 460 }}>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden select-none" style={{ height: 460 }}>
         <div className="flex items-center justify-center" style={{ height: 260, backgroundColor: 'var(--bg-light)' }}>
           {listing.photoUrls?.length > 0 ? (
             <img src={listing.photoUrls[0]} alt={listing.title} className="w-full h-full object-cover" />
@@ -59,7 +60,7 @@ function SwipeCard({ listing, onSwipe, isTop, onChat }) {
                 className="text-xs font-medium px-2 py-0.5 rounded-full"
                 style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}
               >
-                {CATEGORY_LABELS[listing.category] || listing.category}
+                {t('categories.' + listing.category, { defaultValue: listing.category })}
               </span>
               <h3 className="text-lg font-bold mt-2 line-clamp-1" style={{ color: 'var(--primary)' }}>
                 {listing.title}
@@ -83,7 +84,7 @@ function SwipeCard({ listing, onSwipe, isTop, onChat }) {
                 </div>
               )}
               <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>
-                {listing.sellerName || 'Аноним'}
+                {listing.sellerName || t('listing.anonymous')}
               </span>
             </div>
             <button
@@ -91,7 +92,7 @@ function SwipeCard({ listing, onSwipe, isTop, onChat }) {
               className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-medium"
               style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}
             >
-              <MessageCircle size={13} /> Написать
+              <MessageCircle size={13} /> {t('listing.write')}
             </button>
           </div>
         </div>
@@ -101,6 +102,7 @@ function SwipeCard({ listing, onSwipe, isTop, onChat }) {
 }
 
 export default function ListingSwipe({ listings, swipeIndex, onSwipe, onChat, onReset }) {
+  const { t } = useTranslation();
   const remaining = listings.slice(swipeIndex);
   const dots = Math.min(listings.length, MAX_DOTS);
 
@@ -135,15 +137,15 @@ export default function ListingSwipe({ listings, swipeIndex, onSwipe, onChat, on
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-2xl shadow-lg gap-3"
+              className="absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-2xl shadow-lg gap-3"
             >
-              <p className="text-xl font-bold" style={{ color: 'var(--primary)' }}>Всё просмотрено!</p>
-              <p className="text-gray-400 text-sm">Вы просмотрели все объявления</p>
+              <p className="text-xl font-bold" style={{ color: 'var(--primary)' }}>{t('swipe.allViewed')}</p>
+              <p className="text-gray-400 text-sm">{t('swipe.viewedAll')}</p>
               <button
                 onClick={onReset}
                 className="btn-primary px-6 py-2.5 rounded-lg font-medium mt-2"
               >
-                Смотреть снова
+                {t('swipe.viewAgain')}
               </button>
             </motion.div>
           )}
@@ -154,14 +156,14 @@ export default function ListingSwipe({ listings, swipeIndex, onSwipe, onChat, on
         <div className="flex justify-center gap-6 mt-6">
           <button
             onClick={() => onSwipe('left')}
-            className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
             style={{ border: '2px solid #fee2e2' }}
           >
             <X size={24} style={{ color: 'var(--accent)' }} />
           </button>
           <button
             onClick={() => onSwipe('right')}
-            className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
             style={{ border: '2px solid var(--bg-light)' }}
           >
             <Heart size={24} style={{ color: 'var(--primary)' }} />

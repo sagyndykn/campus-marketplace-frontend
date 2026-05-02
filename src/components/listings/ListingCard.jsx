@@ -1,5 +1,5 @@
 import { Heart, MessageCircle } from 'lucide-react';
-import { CATEGORY_LABELS } from '../../data/listings';
+import { useTranslation } from 'react-i18next';
 
 function HeartButton({ isFavorited, onClick, size = 'md' }) {
   const dim = size === 'sm' ? 'w-6 h-6' : 'w-8 h-8';
@@ -7,7 +7,7 @@ function HeartButton({ isFavorited, onClick, size = 'md' }) {
   return (
     <button
       onClick={(e) => { e.stopPropagation(); onClick(); }}
-      className={`${dim} rounded-full bg-white shadow flex items-center justify-center transition-transform hover:scale-110 active:scale-95 flex-shrink-0`}
+      className={`${dim} rounded-full bg-white dark:bg-gray-800 shadow flex items-center justify-center transition-transform hover:scale-110 active:scale-95 flex-shrink-0`}
     >
       <Heart
         size={iconSize}
@@ -19,9 +19,10 @@ function HeartButton({ isFavorited, onClick, size = 'md' }) {
 }
 
 export function GalleryCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
+  const { t } = useTranslation();
   return (
     <div
-      className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow group cursor-pointer"
+      className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow group cursor-pointer"
       onClick={() => onChat?.(listing)}
     >
       <div className="relative overflow-hidden" style={{ height: 180, backgroundColor: 'var(--bg-light)' }}>
@@ -43,7 +44,7 @@ export function GalleryCard({ listing, isFavorited, onFavoriteToggle, onChat }) 
           className="inline-block text-xs font-medium px-2 py-0.5 rounded-full"
           style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}
         >
-          {CATEGORY_LABELS[listing.category] || listing.category}
+          {t('categories.' + listing.category, { defaultValue: listing.category })}
         </span>
         <h3 className="font-semibold text-sm mt-1.5 line-clamp-2 leading-snug" style={{ color: 'var(--primary)' }}>
           {listing.title}
@@ -63,12 +64,12 @@ export function GalleryCard({ listing, isFavorited, onFavoriteToggle, onChat }) 
                 {(listing.sellerName || '?')[0].toUpperCase()}
               </div>
             )}
-            <span className="text-xs text-gray-400 truncate">{listing.sellerName || 'Аноним'}</span>
+            <span className="text-xs text-gray-400 truncate">{listing.sellerName || t('listing.anonymous')}</span>
           </div>
           {onChat && (
             <button
               onClick={(e) => { e.stopPropagation(); onChat(listing); }}
-              className="ml-1 flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
+              className="ml-1 flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               style={{ color: 'var(--primary)' }}
             >
               <MessageCircle size={14} />
@@ -81,8 +82,9 @@ export function GalleryCard({ listing, isFavorited, onFavoriteToggle, onChat }) 
 }
 
 export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
+  const { t } = useTranslation();
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex group cursor-pointer">
+    <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow flex group cursor-pointer">
       <div
         className="flex-shrink-0 overflow-hidden"
         style={{ width: 150, backgroundColor: 'var(--bg-light)' }}
@@ -115,7 +117,7 @@ export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
                 className="inline-block text-xs font-medium px-2 py-0.5 rounded-full"
                 style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}
               >
-                {CATEGORY_LABELS[listing.category] || listing.category}
+                {t('categories.' + listing.category, { defaultValue: listing.category })}
               </span>
               <h3 className="font-semibold text-sm mt-1 line-clamp-2 leading-snug" style={{ color: 'var(--primary)' }}>
                 {listing.title}
@@ -131,7 +133,7 @@ export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
           </p>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-400 hidden sm:block truncate max-w-24">
-              {listing.sellerName || 'Аноним'}
+              {listing.sellerName || t('listing.anonymous')}
             </span>
             {onChat && (
               <button
@@ -139,7 +141,7 @@ export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
                 className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium transition-colors"
                 style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}
               >
-                <MessageCircle size={12} /> Написать
+                <MessageCircle size={12} /> {t('listing.write')}
               </button>
             )}
           </div>
@@ -152,7 +154,7 @@ export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
 export function TileCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
   return (
     <div
-      className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow group cursor-pointer"
+      className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow group cursor-pointer"
       onClick={() => onChat?.(listing)}
     >
       <div className="relative overflow-hidden" style={{ height: 110, backgroundColor: 'var(--bg-light)' }}>

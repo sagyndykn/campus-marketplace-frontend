@@ -1,0 +1,170 @@
+{
+  "nav": {
+    "market": "Market",
+    "wishlist": "Wishlist",
+    "chat": "Chat",
+    "profile": "Profile",
+    "add": "+ Add"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "emailPlaceholder": "example@sdu.edu.kz",
+    "emailHint": "Only @sdu.edu.kz email",
+    "passwordPlaceholder": "Your password",
+    "passwordMinHint": "Minimum 6 characters",
+    "forgotPassword": "Forgot password?",
+    "submitLogin": "Login",
+    "submitRegister": "Register",
+    "loading": "Please wait..."
+  },
+  "otp": {
+    "title": "Verify email",
+    "subtitle": "We sent a 6-digit code to",
+    "back": "Back",
+    "codeValid": "Code valid for",
+    "resend": "Resend code",
+    "sending": "Sending...",
+    "verify": "Verify",
+    "verifying": "Verifying...",
+    "error6digits": "Enter 6-digit code"
+  },
+  "forgotPwd": {
+    "title": "Password recovery",
+    "otpTitle": "Enter code",
+    "emailDesc": "Enter your email — we will send a verification code",
+    "otpDesc": "Code sent to",
+    "sendCode": "Send code",
+    "sending": "Sending...",
+    "confirmCode": "Confirm code",
+    "confirming": "Verifying..."
+  },
+  "newPwd": {
+    "title": "Create new password",
+    "subtitle": "Enter your password twice to confirm",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "placeholder": "Minimum 6 characters",
+    "confirmPlaceholder": "Enter password again",
+    "mismatch": "Passwords do not match",
+    "save": "Save password",
+    "saving": "Saving...",
+    "minLength": "Password must be at least 6 characters"
+  },
+  "feed": {
+    "search": "What are you looking for?",
+    "filters": "Filters",
+    "allCategories": "All categories",
+    "found": "Found: {{count}}",
+    "notFound": "Nothing found",
+    "noResultsTitle": "Nothing found",
+    "noResultsDesc": "Try changing filters or search query"
+  },
+  "sort": {
+    "recommended": "Recommended",
+    "newest": "Newest",
+    "cheapest": "Cheapest",
+    "expensive": "Most expensive"
+  },
+  "view": {
+    "swipe": "Swipe",
+    "gallery": "Gallery",
+    "list": "List",
+    "tile": "Tile"
+  },
+  "filters": {
+    "title": "Filters",
+    "price": "Price (₸)",
+    "from": "From",
+    "to": "To",
+    "onlyWithPhoto": "With photos only",
+    "reset": "Reset",
+    "apply": "Apply"
+  },
+  "listing": {
+    "anonymous": "Anonymous",
+    "write": "Message"
+  },
+  "swipe": {
+    "like": "LIKE",
+    "skip": "SKIP",
+    "allViewed": "All viewed!",
+    "viewedAll": "You have viewed all listings",
+    "viewAgain": "View again"
+  },
+  "wishlist": {
+    "title": "Favourites",
+    "count": "Listings ({{count}})",
+    "clear": "Clear favourites",
+    "added": "Added to favourites",
+    "failUpdate": "Failed to update favourites"
+  },
+  "emptyState": {
+    "title": "No saved listings",
+    "desc": "Swipe listings right on the main page to add them to favourites",
+    "go": "Browse listings"
+  },
+  "addListing": {
+    "title": "New listing",
+    "name": "Title",
+    "namePlaceholder": "What are you selling?",
+    "description": "Description",
+    "descPlaceholder": "Describe the item in detail...",
+    "price": "Price (₸)",
+    "category": "Category",
+    "selectCategory": "Select category",
+    "photos": "Photos",
+    "photosHint": "(up to 5)",
+    "publish": "Publish listing",
+    "publishing": "Publishing...",
+    "success": "Listing published!"
+  },
+  "profile": {
+    "personalData": "Personal details",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "phonePlaceholder": "+7 (XXX) XXX-XX-XX",
+    "save": "Save",
+    "saved": "Saved",
+    "myListings": "My listings",
+    "noListings": "You haven't posted anything yet",
+    "settings": "Settings",
+    "darkMode": "Dark mode",
+    "notifications": "Notifications",
+    "logout": "Log out",
+    "admin": "Administrator",
+    "language": "Language"
+  },
+  "chat": {
+    "title": "Messages",
+    "searchPlaceholder": "Search by name or email...",
+    "noUsers": "No users found",
+    "write": "Message",
+    "noConversations": "No messages yet",
+    "noConversationsDesc": "Find a user above or click \"Message\" on a listing",
+    "startConversation": "Start the conversation — send the first message",
+    "messagePlaceholder": "Message...",
+    "online": "Online",
+    "noMessages": "No messages",
+    "waitingUpload": "Please wait, file is still uploading",
+    "presenceToday": "last seen today at {{time}}",
+    "presenceYesterday": "last seen yesterday at {{time}}",
+    "presenceDate": "last seen {{date}} at {{time}}",
+    "presenceOffline": "offline"
+  },
+  "categories": {
+    "ELECTRONICS": "Electronics",
+    "CLOTHING": "Clothing",
+    "HOME_AND_GARDEN": "Home & Garden",
+    "AUTO": "Automotive",
+    "SPORTS": "Sports",
+    "BOOKS": "Books",
+    "GAMES": "Games",
+    "OTHER": "Other"
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useMarket } from '../context/MarketContext';
 import { getListings, addFavorite, removeFavorite, getFavorites } from '../api/listings';
 import { startConversation } from '../api/chat';
@@ -47,6 +48,7 @@ function readViewMode() {
 }
 
 export default function Index() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { addToWishlist } = useMarket();
 
@@ -65,8 +67,8 @@ export default function Index() {
   const [viewMode, setViewMode] = useState(readViewMode);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), DEBOUNCE_MS);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setDebouncedSearch(search), DEBOUNCE_MS);
+    return () => clearTimeout(timer);
   }, [search]);
 
   useEffect(() => {
@@ -120,9 +122,9 @@ export default function Index() {
         wasFav ? next.add(listing.id) : next.delete(listing.id);
         return next;
       });
-      toast.error('Не удалось обновить избранное');
+      toast.error(t('wishlist.failUpdate'));
     }
-  }, [favoritedIds]);
+  }, [favoritedIds, t]);
 
   const handleSwipe = useCallback((direction) => {
     if (direction === 'right') {
@@ -132,11 +134,11 @@ export default function Index() {
         if (!favoritedIds.has(listing.id)) {
           handleToggleFavorite(listing);
         }
-        toast.success('Добавлено в избранное', { duration: 1500 });
+        toast.success(t('wishlist.added'), { duration: 1500 });
       }
     }
     setSwipeIndex((i) => i + 1);
-  }, [displayedListings, swipeIndex, favoritedIds, addToWishlist, handleToggleFavorite]);
+  }, [displayedListings, swipeIndex, favoritedIds, addToWishlist, handleToggleFavorite, t]);
 
   const handleChat = useCallback(async (listing) => {
     try {
@@ -153,8 +155,8 @@ export default function Index() {
     if (displayedListings.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center py-24 gap-2">
-          <p className="text-lg font-bold" style={{ color: 'var(--primary)' }}>Ничего не найдено</p>
-          <p className="text-sm text-gray-400">Попробуйте изменить фильтры или поисковый запрос</p>
+          <p className="text-lg font-bold" style={{ color: 'var(--primary)' }}>{t('feed.noResultsTitle')}</p>
+          <p className="text-sm text-gray-400">{t('feed.noResultsDesc')}</p>
         </div>
       );
     }
@@ -183,7 +185,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <FeedHeader
         search={search}
         onSearchChange={setSearch}

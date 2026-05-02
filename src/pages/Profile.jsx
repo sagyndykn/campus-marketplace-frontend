@@ -1,18 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import { User, Package, Settings, LogOut, Moon, Bell, Loader, Camera } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getMe, updateMe, uploadAvatar } from '../api/users';
 import { getMyListings } from '../api/listings';
-import { CATEGORY_LABELS } from '../data/listings';
+import LanguageSwitcher from '../components/settings/LanguageSwitcher';
+import { useTheme } from '../hooks/useTheme';
 
 export default function Profile({ onLogout }) {
+  const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
   const [profile, setProfile] = useState(null);
   const [myListings, setMyListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [saveMsg, setSaveMsg] = useState('');
+  const [saveMsgOk, setSaveMsgOk] = useState(false);
   const fileRef = useRef();
 
   useEffect(() => {
@@ -35,10 +39,12 @@ export default function Profile({ onLogout }) {
         phone: profile.phone,
       });
       setProfile(updated);
-      setSaveMsg('Сохранено');
+      setSaveMsg(t('profile.saved'));
+      setSaveMsgOk(true);
       setTimeout(() => setSaveMsg(''), 2000);
     } catch (err) {
       setSaveMsg(err.message);
+      setSaveMsgOk(false);
     } finally {
       setSaving(false);
     }
@@ -72,8 +78,13 @@ export default function Profile({ onLogout }) {
   const initial = (profile.firstName || profile.email || 'S')[0].toUpperCase();
 
   const toggleSettings = [
-    { icon: <Moon size={16} />, label: 'Тёмная тема', value: darkMode, onChange: setDarkMode },
-    { icon: <Bell size={16} />, label: 'Уведомления', value: notifications, onChange: setNotifications },
+    {
+      icon: <Moon size={16} />,
+      label: t('profile.darkMode'),
+      value: theme === 'dark',
+      onChange: (checked) => setTheme(checked ? 'dark' : 'light'),
+    },
+    { icon: <Bell size={16} />, label: t('profile.notifications'), value: notifications, onChange: setNotifications },
   ];
 
   return (
@@ -100,47 +111,47 @@ export default function Profile({ onLogout }) {
         {profile.role === 'ADMIN' && (
           <span className="mt-1 text-xs px-2 py-0.5 rounded-full font-medium"
             style={{ backgroundColor: '#fdf2f2', color: 'var(--accent)' }}>
-            Администратор
+            {t('profile.admin')}
           </span>
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
           <User size={18} style={{ color: 'var(--primary)' }} />
-          <h2 className="font-semibold" style={{ color: 'var(--primary)' }}>Личные данные</h2>
+          <h2 className="font-semibold" style={{ color: 'var(--primary)' }}>{t('profile.personalData')}</h2>
         </div>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1">Имя</label>
+              <label className="block text-xs font-medium text-gray-400 mb-1">{t('profile.firstName')}</label>
               <input type="text" value={profile.firstName || ''} className="input-field input-field-sm"
                 onChange={(e) => setProfile((p) => ({ ...p, firstName: e.target.value }))} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1">Фамилия</label>
+              <label className="block text-xs font-medium text-gray-400 mb-1">{t('profile.lastName')}</label>
               <input type="text" value={profile.lastName || ''} className="input-field input-field-sm"
                 onChange={(e) => setProfile((p) => ({ ...p, lastName: e.target.value }))} />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Телефон</label>
-            <input type="tel" value={profile.phone || ''} placeholder="+7 (XXX) XXX-XX-XX"
+            <label className="block text-xs font-medium text-gray-400 mb-1">{t('profile.phone')}</label>
+            <input type="tel" value={profile.phone || ''} placeholder={t('profile.phonePlaceholder')}
               className="input-field input-field-sm"
               onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Email</label>
+            <label className="block text-xs font-medium text-gray-400 mb-1">{t('auth.email')}</label>
             <input type="email" value={profile.email} disabled className="input-field input-field-sm" />
           </div>
           <div className="flex items-center gap-3">
             <button onClick={handleSave} disabled={saving}
               className="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60">
               {saving && <Loader size={14} className="animate-spin" />}
-              Сохранить
+              {t('profile.save')}
             </button>
             {saveMsg && (
-              <span className="text-sm" style={{ color: saveMsg === 'Сохранено' ? '#16a34a' : 'var(--accent)' }}>
+              <span className="text-sm" style={{ color: saveMsgOk ? '#16a34a' : 'var(--accent)' }}>
                 {saveMsg}
               </span>
             )}
@@ -148,10 +159,10 @@ export default function Profile({ onLogout }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
           <Package size={18} style={{ color: 'var(--primary)' }} />
-          <h2 className="font-semibold" style={{ color: 'var(--primary)' }}>Мои объявления</h2>
+          <h2 className="font-semibold" style={{ color: 'var(--primary)' }}>{t('profile.myListings')}</h2>
           {myListings.length > 0 && (
             <span className="text-xs px-2 py-0.5 rounded-full ml-1"
               style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}>
@@ -160,15 +171,15 @@ export default function Profile({ onLogout }) {
           )}
         </div>
         {myListings.length === 0 ? (
-          <p className="text-sm text-gray-400">Вы ещё ничего не разместили</p>
+          <p className="text-sm text-gray-400">{t('profile.noListings')}</p>
         ) : (
           <div className="flex flex-col gap-2">
             {myListings.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+              <div key={item.id} className="flex items-center gap-3 py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
                 <div className="w-8 h-8 rounded-lg shrink-0" style={{ backgroundColor: 'var(--bg-light)' }} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>{item.title}</p>
-                  <p className="text-xs text-gray-400">{CATEGORY_LABELS[item.category] || item.category}</p>
+                  <p className="text-xs text-gray-400">{t('categories.' + item.category, { defaultValue: item.category })}</p>
                 </div>
                 <p className="text-sm font-bold shrink-0" style={{ color: 'var(--accent)' }}>
                   {item.price?.toLocaleString('ru-RU')} ₸
@@ -179,12 +190,13 @@ export default function Profile({ onLogout }) {
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
           <Settings size={18} style={{ color: 'var(--primary)' }} />
-          <h2 className="font-semibold" style={{ color: 'var(--primary)' }}>Настройки</h2>
+          <h2 className="font-semibold" style={{ color: 'var(--primary)' }}>{t('profile.settings')}</h2>
         </div>
         <div className="space-y-3">
+          <LanguageSwitcher />
           {toggleSettings.map(({ icon, label, value, onChange }) => (
             <div key={label} className="flex items-center justify-between py-1">
               <div className="flex items-center gap-2 text-gray-400">
@@ -205,7 +217,7 @@ export default function Profile({ onLogout }) {
       <button onClick={onLogout}
         className="btn-outline-accent w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium">
         <LogOut size={16} />
-        Выйти из аккаунта
+        {t('profile.logout')}
       </button>
     </div>
   );

@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { KeyRound, Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { changePassword } from '../api/auth';
 
 export default function NewPasswordModal({ open, onSuccess }) {
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [showPass, setShowPass] = useState(false);
@@ -13,8 +15,8 @@ export default function NewPasswordModal({ open, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password.length < 6) { setError('Пароль должен содержать минимум 6 символов'); return; }
-    if (password !== confirm) { setError('Пароли не совпадают'); return; }
+    if (password.length < 6) { setError(t('newPwd.minLength')); return; }
+    if (password !== confirm) { setError(t('newPwd.mismatch')); return; }
     setError('');
     setLoading(true);
     try {
@@ -50,21 +52,21 @@ export default function NewPasswordModal({ open, onSuccess }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 24 }}
               transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8"
+              className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm p-8"
             >
               <div className="text-center mb-7">
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl mb-4"
                   style={{ backgroundColor: 'var(--bg-light)' }}>
                   <KeyRound size={26} style={{ color: 'var(--primary)' }} />
                 </div>
-                <h2 className="text-xl font-bold" style={{ color: 'var(--primary)' }}>Придумайте новый пароль</h2>
-                <p className="text-sm mt-1.5 text-gray-400">Введите пароль дважды для подтверждения</p>
+                <h2 className="text-xl font-bold" style={{ color: 'var(--primary)' }}>{t('newPwd.title')}</h2>
+                <p className="text-sm mt-1.5 text-gray-400">{t('newPwd.subtitle')}</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
-                    Новый пароль
+                    {t('newPwd.newPassword')}
                   </label>
                   <div className="relative">
                     <input
@@ -74,7 +76,7 @@ export default function NewPasswordModal({ open, onSuccess }) {
                       minLength={6}
                       value={password}
                       onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                      placeholder="Минимум 6 символов"
+                      placeholder={t('newPwd.placeholder')}
                       className="input-field pr-10"
                     />
                     <button type="button" onClick={() => setShowPass(!showPass)}
@@ -86,7 +88,7 @@ export default function NewPasswordModal({ open, onSuccess }) {
 
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
-                    Повторите пароль
+                    {t('newPwd.confirmPassword')}
                   </label>
                   <div className="relative">
                     <input
@@ -95,7 +97,7 @@ export default function NewPasswordModal({ open, onSuccess }) {
                       minLength={6}
                       value={confirm}
                       onChange={(e) => { setConfirm(e.target.value); setError(''); }}
-                      placeholder="Введите пароль ещё раз"
+                      placeholder={t('newPwd.confirmPlaceholder')}
                       className="input-field pr-10"
                       style={confirm.length > 0 && confirm !== password
                         ? { borderColor: 'var(--accent)' }
@@ -107,7 +109,7 @@ export default function NewPasswordModal({ open, onSuccess }) {
                     </button>
                   </div>
                   {confirm.length > 0 && confirm !== password && (
-                    <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>Пароли не совпадают</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--accent)' }}>{t('newPwd.mismatch')}</p>
                   )}
                 </div>
 
@@ -122,7 +124,7 @@ export default function NewPasswordModal({ open, onSuccess }) {
                   disabled={loading || !valid}
                   className="btn-primary w-full font-medium py-2.5 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed mt-2"
                 >
-                  {loading ? 'Сохранение...' : 'Сохранить пароль'}
+                  {loading ? t('newPwd.saving') : t('newPwd.save')}
                 </button>
               </form>
             </motion.div>

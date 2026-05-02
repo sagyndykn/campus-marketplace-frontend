@@ -1,0 +1,170 @@
+{
+  "nav": {
+    "market": "Маркет",
+    "wishlist": "Избранное",
+    "chat": "Чат",
+    "profile": "Профиль",
+    "add": "+ Добавить"
+  },
+  "auth": {
+    "login": "Войти",
+    "register": "Регистрация",
+    "email": "Email",
+    "password": "Пароль",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "emailPlaceholder": "example@sdu.edu.kz",
+    "emailHint": "Только почта @sdu.edu.kz",
+    "passwordPlaceholder": "Ваш пароль",
+    "passwordMinHint": "Минимум 6 символов",
+    "forgotPassword": "Забыли пароль?",
+    "submitLogin": "Войти",
+    "submitRegister": "Зарегистрироваться",
+    "loading": "Подождите..."
+  },
+  "otp": {
+    "title": "Подтвердите email",
+    "subtitle": "Мы отправили 6-значный код на",
+    "back": "Назад",
+    "codeValid": "Код действует",
+    "resend": "Отправить код снова",
+    "sending": "Отправка...",
+    "verify": "Подтвердить",
+    "verifying": "Проверка...",
+    "error6digits": "Введите 6-значный код"
+  },
+  "forgotPwd": {
+    "title": "Восстановление пароля",
+    "otpTitle": "Введите код",
+    "emailDesc": "Введите email — мы отправим код подтверждения",
+    "otpDesc": "Код отправлен на",
+    "sendCode": "Отправить код",
+    "sending": "Отправка...",
+    "confirmCode": "Подтвердить код",
+    "confirming": "Проверка..."
+  },
+  "newPwd": {
+    "title": "Придумайте новый пароль",
+    "subtitle": "Введите пароль дважды для подтверждения",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Повторите пароль",
+    "placeholder": "Минимум 6 символов",
+    "confirmPlaceholder": "Введите пароль ещё раз",
+    "mismatch": "Пароли не совпадают",
+    "save": "Сохранить пароль",
+    "saving": "Сохранение...",
+    "minLength": "Пароль должен содержать минимум 6 символов"
+  },
+  "feed": {
+    "search": "Что ищете?",
+    "filters": "Фильтры",
+    "allCategories": "Все категории",
+    "found": "Найдено: {{count}}",
+    "notFound": "Ничего не найдено",
+    "noResultsTitle": "Ничего не найдено",
+    "noResultsDesc": "Попробуйте изменить фильтры или поисковый запрос"
+  },
+  "sort": {
+    "recommended": "Рекомендованные",
+    "newest": "Самые новые",
+    "cheapest": "Самые дешевые",
+    "expensive": "Самые дорогие"
+  },
+  "view": {
+    "swipe": "Свайп",
+    "gallery": "Галерея",
+    "list": "Список",
+    "tile": "Плитка"
+  },
+  "filters": {
+    "title": "Фильтры",
+    "price": "Цена (₸)",
+    "from": "От",
+    "to": "До",
+    "onlyWithPhoto": "Только с фото",
+    "reset": "Сбросить",
+    "apply": "Применить"
+  },
+  "listing": {
+    "anonymous": "Аноним",
+    "write": "Написать"
+  },
+  "swipe": {
+    "like": "ЛАЙК",
+    "skip": "ПРОПУСК",
+    "allViewed": "Всё просмотрено!",
+    "viewedAll": "Вы просмотрели все объявления",
+    "viewAgain": "Смотреть снова"
+  },
+  "wishlist": {
+    "title": "Избранное",
+    "count": "Объявления ({{count}})",
+    "clear": "Очистить избранное",
+    "added": "Добавлено в избранное",
+    "failUpdate": "Не удалось обновить избранное"
+  },
+  "emptyState": {
+    "title": "У вас нет избранных объявлений",
+    "desc": "Свайпайте объявления вправо на главной, чтобы добавить их в избранное",
+    "go": "Перейти к объявлениям"
+  },
+  "addListing": {
+    "title": "Новое объявление",
+    "name": "Название",
+    "namePlaceholder": "Что продаёте?",
+    "description": "Описание",
+    "descPlaceholder": "Опишите товар подробнее...",
+    "price": "Цена (₸)",
+    "category": "Категория",
+    "selectCategory": "Выберите категорию",
+    "photos": "Фото",
+    "photosHint": "(до 5 штук)",
+    "publish": "Опубликовать объявление",
+    "publishing": "Публикация...",
+    "success": "Объявление опубликовано!"
+  },
+  "profile": {
+    "personalData": "Личные данные",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "phone": "Телефон",
+    "phonePlaceholder": "+7 (XXX) XXX-XX-XX",
+    "save": "Сохранить",
+    "saved": "Сохранено",
+    "myListings": "Мои объявления",
+    "noListings": "Вы ещё ничего не разместили",
+    "settings": "Настройки",
+    "darkMode": "Тёмная тема",
+    "notifications": "Уведомления",
+    "logout": "Выйти из аккаунта",
+    "admin": "Администратор",
+    "language": "Язык"
+  },
+  "chat": {
+    "title": "Сообщения",
+    "searchPlaceholder": "Поиск по имени или email...",
+    "noUsers": "Пользователи не найдены",
+    "write": "Написать",
+    "noConversations": "Сообщений пока нет",
+    "noConversationsDesc": "Найдите пользователя выше или нажмите «Написать» на объявлении",
+    "startConversation": "Начните диалог — напишите первое сообщение",
+    "messagePlaceholder": "Сообщение...",
+    "online": "В сети",
+    "noMessages": "Нет сообщений",
+    "waitingUpload": "Подождите, файл ещё загружается",
+    "presenceToday": "был(а) сегодня в {{time}}",
+    "presenceYesterday": "был(а) вчера в {{time}}",
+    "presenceDate": "был(а) {{date}} в {{time}}",
+    "presenceOffline": "не в сети"
+  },
+  "categories": {
+    "ELECTRONICS": "Электроника",
+    "CLOTHING": "Одежда",
+    "HOME_AND_GARDEN": "Дом и сад",
+    "AUTO": "Авто",
+    "SPORTS": "Спорт",
+    "BOOKS": "Книги",
+    "GAMES": "Игры",
+    "OTHER": "Другое"
+  }
+}

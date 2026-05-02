@@ -1,30 +1,31 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageCircle, Loader, ChevronRight, Search, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getConversations, startConversation, searchUsers } from '../api/chat';
 import { toast } from 'sonner';
 
-function formatTime(isoString) {
+function formatTime(isoString, lng) {
   if (!isoString) return '';
   const d = new Date(isoString);
   const now = new Date();
   const isToday = d.toDateString() === now.toDateString();
   if (isToday) {
-    return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleTimeString(lng === 'en' ? 'en-GB' : 'ru-RU', { hour: '2-digit', minute: '2-digit' });
   }
-  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+  return d.toLocaleDateString(lng === 'en' ? 'en-GB' : 'ru-RU', { day: 'numeric', month: 'short' });
 }
 
 export default function Chat() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // search state
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [starting, setStarting] = useState(null); // userId being opened
+  const [starting, setStarting] = useState(null);
   const debounceRef = useRef(null);
   const searchRef = useRef(null);
 
@@ -35,7 +36,6 @@ export default function Chat() {
       .finally(() => setLoading(false));
   }, []);
 
-  // debounced search
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!query.trim()) {
@@ -76,6 +76,7 @@ export default function Chat() {
   };
 
   const showSearch = query.trim().length > 0;
+  const lng = i18n.language?.slice(0, 2);
 
   if (loading) {
     return (
@@ -87,18 +88,17 @@ export default function Chat() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6 pb-24 md:pb-8">
-      <h1 className="text-xl font-bold mb-4" style={{ color: 'var(--primary)' }}>Сообщения</h1>
+      <h1 className="text-xl font-bold mb-4" style={{ color: 'var(--primary)' }}>{t('chat.title')}</h1>
 
-      {/* Search bar */}
       <div className="relative mb-4" ref={searchRef}>
         <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl"
-          style={{ border: '1.5px solid var(--border)', backgroundColor: '#f8fafc' }}>
+          style={{ border: '1.5px solid var(--border)', backgroundColor: 'var(--surface-muted)' }}>
           <Search size={16} style={{ color: '#9ca3af', flexShrink: 0 }} />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Поиск по имени или email..."
+            placeholder={t('chat.searchPlaceholder')}
             className="flex-1 bg-transparent text-sm outline-none"
             style={{ color: 'var(--text)' }}
           />
@@ -109,16 +109,15 @@ export default function Chat() {
           )}
         </div>
 
-        {/* Search results dropdown */}
         {showSearch && (
-          <div className="absolute z-20 left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="absolute z-20 left-0 right-0 mt-1 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
             {searching ? (
               <div className="flex items-center justify-center py-6">
                 <Loader size={20} className="animate-spin" style={{ color: 'var(--primary)' }} />
               </div>
             ) : searchResults.length === 0 ? (
               <p className="text-center text-sm py-5" style={{ color: '#9ca3af' }}>
-                Пользователи не найдены
+                {t('chat.noUsers')}
               </p>
             ) : (
               searchResults.map((user, i) => {
@@ -129,7 +128,7 @@ export default function Chat() {
                     key={user.id}
                     onClick={() => handleOpenChat(user)}
                     disabled={isStarting}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left disabled:opacity-60"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left disabled:opacity-60"
                     style={{ borderBottom: i < searchResults.length - 1 ? '1px solid #f3f4f6' : 'none' }}
                   >
                     {user.avatarUrl ? (
@@ -149,7 +148,7 @@ export default function Chat() {
                     ) : (
                       <span className="text-xs px-2.5 py-1 rounded-full shrink-0 font-medium"
                         style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}>
-                        Написать
+                        {t('chat.write')}
                       </span>
                     )}
                   </button>
@@ -160,25 +159,24 @@ export default function Chat() {
         )}
       </div>
 
-      {/* Conversations list */}
       {conversations.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
             style={{ backgroundColor: 'var(--bg-light)' }}>
             <MessageCircle size={28} style={{ color: 'var(--primary)' }} />
           </div>
-          <p className="font-bold text-base mb-1" style={{ color: 'var(--primary)' }}>Сообщений пока нет</p>
+          <p className="font-bold text-base mb-1" style={{ color: 'var(--primary)' }}>{t('chat.noConversations')}</p>
           <p className="text-sm" style={{ color: '#9ca3af' }}>
-            Найдите пользователя выше или нажмите «Написать» на объявлении
+            {t('chat.noConversationsDesc')}
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
           {conversations.map((conv, i) => (
             <button
               key={conv.id}
               onClick={() => navigate(`/chat/${conv.id}`, { state: { otherUserId: conv.otherUserId, otherUserName: conv.otherUserName } })}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
               style={{ borderBottom: i < conversations.length - 1 ? '1px solid #f3f4f6' : 'none' }}
             >
               <div className="shrink-0 relative">
@@ -198,7 +196,7 @@ export default function Chat() {
                     {conv.otherUserName}
                   </p>
                   <span className="text-xs shrink-0 ml-2" style={{ color: '#9ca3af' }}>
-                    {formatTime(conv.lastMessageAt)}
+                    {formatTime(conv.lastMessageAt, lng)}
                   </span>
                 </div>
                 <p className="text-xs truncate" style={{ color: '#9ca3af' }}>
@@ -207,7 +205,7 @@ export default function Chat() {
                       {conv.listingTitle} · {' '}
                     </span>
                   )}
-                  {conv.lastMessage || 'Нет сообщений'}
+                  {conv.lastMessage || t('chat.noMessages')}
                 </p>
               </div>
 

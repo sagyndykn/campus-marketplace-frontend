@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { ShoppingBag, Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { register, login } from '../../api/auth';
 
 export default function AuthPage({ onOtpSent, onLogin, onForgotPassword }) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
   const [showPass, setShowPass] = useState(false);
@@ -35,8 +37,8 @@ export default function AuthPage({ onOtpSent, onLogin, onForgotPassword }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #e4e9f7 100%)' }}>
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-slate-200 dark:from-slate-950 dark:to-gray-900">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md p-8">
 
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl mb-4" style={{ backgroundColor: 'var(--primary)' }}>
@@ -46,7 +48,7 @@ export default function AuthPage({ onOtpSent, onLogin, onForgotPassword }) {
           <p className="text-sm mt-1 font-medium" style={{ color: 'var(--accent)' }}>SDU University</p>
         </div>
 
-        <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+        <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mb-6">
           {['login', 'register'].map((m) => (
             <button key={m} type="button" onClick={() => switchMode(m)}
               className="flex-1 py-2 text-sm font-medium rounded-md transition-all"
@@ -54,7 +56,7 @@ export default function AuthPage({ onOtpSent, onLogin, onForgotPassword }) {
                 ? { backgroundColor: 'var(--primary)', color: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }
                 : { color: 'var(--text)' }
               }>
-              {m === 'login' ? 'Войти' : 'Регистрация'}
+              {m === 'login' ? t('auth.login') : t('auth.register')}
             </button>
           ))}
         </div>
@@ -63,42 +65,42 @@ export default function AuthPage({ onOtpSent, onLogin, onForgotPassword }) {
           {mode === 'register' && (
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Имя</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>{t('auth.firstName')}</label>
                 <input type="text" required value={form.firstName} onChange={set('firstName')}
-                  placeholder="Имя" className="input-field" />
+                  placeholder={t('auth.firstName')} className="input-field" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Фамилия</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>{t('auth.lastName')}</label>
                 <input type="text" required value={form.lastName} onChange={set('lastName')}
-                  placeholder="Фамилия" className="input-field" />
+                  placeholder={t('auth.lastName')} className="input-field" />
               </div>
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Email</label>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>{t('auth.email')}</label>
             <input type="email" required value={form.email} onChange={set('email')}
-              placeholder="example@sdu.edu.kz"
+              placeholder={t('auth.emailPlaceholder')}
               pattern="[a-zA-Z0-9._%+\-]+@sdu\.edu\.kz"
               className="input-field" />
-            <p className="text-xs text-gray-400 mt-1">Только почта @sdu.edu.kz</p>
+            <p className="text-xs text-gray-400 mt-1">{t('auth.emailHint')}</p>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-sm font-medium" style={{ color: 'var(--text)' }}>Пароль</label>
+              <label className="text-sm font-medium" style={{ color: 'var(--text)' }}>{t('auth.password')}</label>
               {mode === 'login' && (
                 <button type="button" onClick={onForgotPassword}
                   className="text-xs font-medium hover:underline"
                   style={{ color: 'var(--primary)' }}>
-                  Забыли пароль?
+                  {t('auth.forgotPassword')}
                 </button>
               )}
             </div>
             <div className="relative">
               <input type={showPass ? 'text' : 'password'} required minLength={6}
                 value={form.password} onChange={set('password')}
-                placeholder={mode === 'register' ? 'Минимум 6 символов' : 'Ваш пароль'}
+                placeholder={mode === 'register' ? t('auth.passwordMinHint') : t('auth.passwordPlaceholder')}
                 className="input-field pr-10" />
               <button type="button" onClick={() => setShowPass(!showPass)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -115,7 +117,7 @@ export default function AuthPage({ onOtpSent, onLogin, onForgotPassword }) {
 
           <button type="submit" disabled={loading}
             className="btn-primary w-full font-medium py-2.5 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
-            {loading ? 'Подождите...' : mode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+            {loading ? t('auth.loading') : mode === 'login' ? t('auth.submitLogin') : t('auth.submitRegister')}
           </button>
         </form>
       </div>

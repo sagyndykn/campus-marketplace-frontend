@@ -1,15 +1,9 @@
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { CATEGORIES } from '../../data/listings';
+import { useTranslation } from 'react-i18next';
+import { CATEGORY_VALUES } from '../../data/listings';
 import ViewSwitcher from '../listings/ViewSwitcher';
 
 const FEED_MODES = ['swipe', 'gallery', 'list', 'tile'];
-
-const SORT_OPTIONS = [
-  { value: 'recommended', label: 'Рекомендованные' },
-  { value: 'newest', label: 'Самые новые' },
-  { value: 'cheapest', label: 'Самые дешевые' },
-  { value: 'expensive', label: 'Самые дорогие' },
-];
 
 export default function FeedHeader({
   search, onSearchChange,
@@ -21,8 +15,17 @@ export default function FeedHeader({
   loading,
   hasActiveFilters,
 }) {
+  const { t } = useTranslation();
+
+  const SORT_OPTIONS = [
+    { value: 'recommended', label: t('sort.recommended') },
+    { value: 'newest', label: t('sort.newest') },
+    { value: 'cheapest', label: t('sort.cheapest') },
+    { value: 'expensive', label: t('sort.expensive') },
+  ];
+
   return (
-    <div className="bg-white border-b border-gray-100 px-4 py-3 space-y-2 sticky top-0 md:top-16 z-30">
+    <div className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 py-3 space-y-2 sticky top-0 md:top-16 z-30">
       <div className="flex gap-2">
         <div className="flex-1 relative">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -30,8 +33,8 @@ export default function FeedHeader({
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Что ищете?"
-            className="w-full pl-9 pr-3 py-2 rounded-lg border text-sm outline-none transition-colors bg-white"
+            placeholder={t('feed.search')}
+            className="w-full pl-9 pr-3 py-2 rounded-lg border text-sm outline-none transition-colors bg-white dark:bg-gray-800"
             style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
             onFocus={(e) => (e.target.style.borderColor = 'var(--primary)')}
             onBlur={(e) => (e.target.style.borderColor = 'var(--border)')}
@@ -39,11 +42,11 @@ export default function FeedHeader({
         </div>
         <button
           onClick={onFiltersOpen}
-          className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm font-medium transition-colors hover:bg-gray-50 flex-shrink-0"
+          className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 flex-shrink-0"
           style={{ borderColor: hasActiveFilters ? 'var(--primary)' : 'var(--border)', color: hasActiveFilters ? 'var(--primary)' : 'var(--text)' }}
         >
           <SlidersHorizontal size={15} />
-          <span className="hidden sm:inline">Фильтры</span>
+          <span className="hidden sm:inline">{t('feed.filters')}</span>
           {hasActiveFilters && (
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--accent)' }} />
           )}
@@ -54,19 +57,19 @@ export default function FeedHeader({
         <select
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
-          className="flex-1 min-w-0 px-3 py-1.5 rounded-lg border text-sm outline-none bg-white"
+          className="flex-1 min-w-0 px-3 py-1.5 rounded-lg border text-sm outline-none bg-white dark:bg-gray-800"
           style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
         >
-          <option value="">Все категории</option>
-          {CATEGORIES.map(({ value, label }) => (
-            <option key={value} value={value}>{label}</option>
+          <option value="">{t('feed.allCategories')}</option>
+          {CATEGORY_VALUES.map((val) => (
+            <option key={val} value={val}>{t('categories.' + val)}</option>
           ))}
         </select>
 
         <select
           value={sort}
           onChange={(e) => onSortChange(e.target.value)}
-          className="flex-1 min-w-0 px-3 py-1.5 rounded-lg border text-sm outline-none bg-white"
+          className="flex-1 min-w-0 px-3 py-1.5 rounded-lg border text-sm outline-none bg-white dark:bg-gray-800"
           style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
         >
           {SORT_OPTIONS.map(({ value, label }) => (
@@ -79,7 +82,7 @@ export default function FeedHeader({
 
       {!loading && resultCount !== undefined && search && (
         <p className="text-xs text-gray-400">
-          {resultCount > 0 ? `Найдено: ${resultCount}` : 'Ничего не найдено'}
+          {resultCount > 0 ? t('feed.found', { count: resultCount }) : t('feed.notFound')}
         </p>
       )}
     </div>

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useWishlist } from '../hooks/useWishlist';
 import ViewSwitcher from '../components/listings/ViewSwitcher';
 import ListingGrid from '../components/listings/ListingGrid';
@@ -12,6 +13,7 @@ import SkeletonLoader from '../components/wishlist/SkeletonLoader';
 const WISHLIST_MODES = ['gallery', 'list', 'tile'];
 
 export default function Wishlist() {
+  const { t } = useTranslation();
   const { items, loading, viewMode, setViewMode, toggleFavorite, clearAll } = useWishlist();
 
   const favoritedIds = useMemo(() => new Set(items.map((i) => i.id)), [items]);
@@ -19,16 +21,16 @@ export default function Wishlist() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 pb-24 md:pb-8 pt-4">
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="px-4 md:px-6 pt-4 md:pt-5 pb-4 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-hidden">
+        <div className="px-4 md:px-6 pt-4 md:pt-5 pb-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-lg font-bold" style={{ color: 'var(--primary)' }}>
-                Избранное
+                {t('wishlist.title')}
               </h1>
               {!loading && (
                 <p className="text-sm text-gray-400 mt-0.5">
-                  Объявления ({items.length})
+                  {t('wishlist.count', { count: items.length })}
                 </p>
               )}
             </div>
@@ -41,7 +43,7 @@ export default function Wishlist() {
                   style={{ color: 'var(--accent)' }}
                 >
                   <Trash2 size={14} />
-                  Очистить избранное
+                  {t('wishlist.clear')}
                 </button>
               )}
               <ViewSwitcher viewMode={viewMode} onChangeMode={setViewMode} modes={WISHLIST_MODES} />
