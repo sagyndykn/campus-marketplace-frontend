@@ -15,9 +15,11 @@ import NewPasswordModal from './components/NewPasswordModal';
 import Index from './pages/Index';
 import Wishlist from './pages/Wishlist';
 import AddListing from './pages/AddListing';
+import ListingDetails from './pages/ListingDetails';
 import Chat from './pages/Chat';
 import ChatDialog from './pages/ChatDialog';
 import Profile from './pages/Profile';
+import ProfileListings from './pages/ProfileListings';
 
 function AuthFlow({ onLogin, onResetVerified }) {
   const [view, setView] = useState('auth');
@@ -123,9 +125,11 @@ export default function App() {
             <Route path="/" element={<Index />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/add" element={<AddListing />} />
+            <Route path="/listings/:id" element={<ListingDetails />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/chat/:id" element={<ChatDialog />} />
             <Route path="/profile" element={<Profile onLogout={handleLogout} />} />
+            <Route path="/profile/:sellerId/listings" element={<ProfileListings />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Layout>
