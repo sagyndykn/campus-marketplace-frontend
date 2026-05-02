@@ -27,24 +27,37 @@ export default function FiltersModal({ open, onClose, filters, onApply }) {
     <AnimatePresence>
       {open && (
         <>
+          {/* overlay — выше bottom nav (z-50) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/40 z-40"
+            className="fixed inset-0 bg-black/40 z-[90]"
           />
+
+          {/* bottom sheet — выше overlay */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-2xl z-50 p-6 max-h-[80vh] overflow-y-auto"
+            className="fixed left-0 right-0 bottom-0 z-[100] bg-white dark:bg-gray-900 rounded-t-2xl flex flex-col overflow-hidden"
+            style={{ maxHeight: 'calc(100dvh - 24px)' }}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold" style={{ color: 'var(--primary)' }}>{t('filters.title')}</h2>
+            {/* drag handle */}
+            <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+              <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+            </div>
+
+            {/* header */}
+            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
+              <h2 className="text-lg font-bold" style={{ color: 'var(--primary)' }}>
+                {t('filters.title')}
+              </h2>
               <button
+                type="button"
                 onClick={onClose}
                 className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
               >
@@ -52,61 +65,76 @@ export default function FiltersModal({ open, onClose, filters, onApply }) {
               </button>
             </div>
 
-            <div className="mb-5">
-              <p className="text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>{t('filters.price')}</p>
-              <div className="flex gap-3">
-                <input
-                  type="number"
-                  placeholder={t('filters.from')}
-                  value={local.minPrice}
-                  onChange={(e) => setLocal((p) => ({ ...p, minPrice: e.target.value }))}
-                  className="input-field flex-1"
-                  min={0}
-                />
-                <input
-                  type="number"
-                  placeholder={t('filters.to')}
-                  value={local.maxPrice}
-                  onChange={(e) => setLocal((p) => ({ ...p, maxPrice: e.target.value }))}
-                  className="input-field flex-1"
-                  min={0}
-                />
+            {/* scrollable body */}
+            <div className="flex-1 overflow-y-auto px-6">
+              {/* price */}
+              <div className="mb-5">
+                <p className="text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
+                  {t('filters.price')}
+                </p>
+                <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-3">
+                  <input
+                    type="number"
+                    placeholder={t('filters.from')}
+                    value={local.minPrice}
+                    onChange={(e) => setLocal((p) => ({ ...p, minPrice: e.target.value }))}
+                    className="input-field"
+                    min={0}
+                  />
+                  <input
+                    type="number"
+                    placeholder={t('filters.to')}
+                    value={local.maxPrice}
+                    onChange={(e) => setLocal((p) => ({ ...p, maxPrice: e.target.value }))}
+                    className="input-field"
+                    min={0}
+                  />
+                </div>
+              </div>
+
+              {/* toggle */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>
+                    {t('filters.onlyWithPhoto')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setLocal((p) => ({ ...p, onlyWithPhoto: !p.onlyWithPhoto }))}
+                    className="w-10 h-6 rounded-full transition-colors relative flex-shrink-0"
+                    style={{ backgroundColor: local.onlyWithPhoto ? 'var(--primary)' : '#d1d5db' }}
+                  >
+                    <div
+                      className="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm"
+                      style={{ left: local.onlyWithPhoto ? 22 : 4 }}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="mb-8">
-              <label className="flex items-center gap-3 cursor-pointer select-none">
+            {/* sticky footer */}
+            <div
+              className="flex-shrink-0 px-6 pt-3 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900"
+              style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }}
+            >
+              <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setLocal((p) => ({ ...p, onlyWithPhoto: !p.onlyWithPhoto }))}
-                  className="w-11 h-6 rounded-full transition-colors relative flex-shrink-0"
-                  style={{ backgroundColor: local.onlyWithPhoto ? 'var(--primary)' : '#d1d5db' }}
+                  onClick={handleReset}
+                  className="flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
                 >
-                  <span
-                    className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform"
-                    style={{ transform: local.onlyWithPhoto ? 'translateX(20px)' : 'translateX(2px)' }}
-                  />
+                  {t('filters.reset')}
                 </button>
-                <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>
-                  {t('filters.onlyWithPhoto')}
-                </span>
-              </label>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleReset}
-                className="flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
-                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              >
-                {t('filters.reset')}
-              </button>
-              <button
-                onClick={handleApply}
-                className="flex-1 btn-primary py-2.5 rounded-lg text-sm font-medium"
-              >
-                {t('filters.apply')}
-              </button>
+                <button
+                  type="button"
+                  onClick={handleApply}
+                  className="flex-1 btn-primary py-2.5 rounded-lg text-sm font-medium"
+                >
+                  {t('filters.apply')}
+                </button>
+              </div>
             </div>
           </motion.div>
         </>
