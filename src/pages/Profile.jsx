@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { getMe, updateMe, uploadAvatar } from '../api/users';
 import { getMyListings } from '../api/listings';
 import LanguageSwitcher from '../components/settings/LanguageSwitcher';
+import ListingList from '../components/listings/ListingList';
 import { useTheme } from '../hooks/useTheme';
 
 export default function Profile({ onLogout }) {
@@ -173,20 +174,7 @@ export default function Profile({ onLogout }) {
         {myListings.length === 0 ? (
           <p className="text-sm text-gray-400">{t('profile.noListings')}</p>
         ) : (
-          <div className="flex flex-col gap-2">
-            {myListings.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
-                <div className="w-8 h-8 rounded-lg shrink-0" style={{ backgroundColor: 'var(--bg-light)' }} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>{item.title}</p>
-                  <p className="text-xs text-gray-400">{t('categories.' + item.category, { defaultValue: item.category })}</p>
-                </div>
-                <p className="text-sm font-bold shrink-0" style={{ color: 'var(--accent)' }}>
-                  {item.price?.toLocaleString('ru-RU')} ₸
-                </p>
-              </div>
-            ))}
-          </div>
+          <ListingList items={myListings} />
         )}
       </div>
 
