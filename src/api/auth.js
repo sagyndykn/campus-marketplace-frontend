@@ -24,6 +24,23 @@ export const register = (data) => request('/auth/register', data);
 export const login = (data) => request('/auth/login', data);
 export const verifyOtp = (data) => request('/auth/verify-otp', data);
 export const resendOtp = (data) => request('/auth/resend-otp', data);
+export const forgotPassword = (data) => request('/auth/forgot-password', data);
+export const resetPassword = (data) => request('/auth/reset-password', data);
+export const verifyResetOtp = (data) => request('/auth/verify-reset-otp', data);
+
+export const changePassword = (newPassword, accessToken) =>
+  fetch(`${BASE_URL}/auth/change-password`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ newPassword }),
+  }).then(async (res) => {
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || 'Ошибка смены пароля');
+    return text;
+  });
 
 export const logout = (accessToken, refreshToken) =>
   fetch(`${BASE_URL}/auth/logout`, {

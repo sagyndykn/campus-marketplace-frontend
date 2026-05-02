@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ShoppingBag, Eye, EyeOff } from 'lucide-react';
 import { register, login } from '../../api/auth';
 
-export default function AuthPage({ onOtpSent, onLogin }) {
+export default function AuthPage({ onOtpSent, onLogin, onForgotPassword }) {
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
   const [showPass, setShowPass] = useState(false);
@@ -85,7 +85,16 @@ export default function AuthPage({ onOtpSent, onLogin }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Пароль</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-sm font-medium" style={{ color: 'var(--text)' }}>Пароль</label>
+              {mode === 'login' && (
+                <button type="button" onClick={onForgotPassword}
+                  className="text-xs font-medium hover:underline"
+                  style={{ color: 'var(--primary)' }}>
+                  Забыли пароль?
+                </button>
+              )}
+            </div>
             <div className="relative">
               <input type={showPass ? 'text' : 'password'} required minLength={6}
                 value={form.password} onChange={set('password')}

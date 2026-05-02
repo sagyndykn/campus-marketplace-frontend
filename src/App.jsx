@@ -9,6 +9,8 @@ import { isTokenExpired } from './api/client';
 
 import AuthPage from './pages/auth/AuthPage';
 import OtpPage from './pages/auth/OtpPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import NewPasswordModal from './components/NewPasswordModal';
 import Index from './pages/Index';
 import Wishlist from './pages/Wishlist';
 import AddListing from './pages/AddListing';
@@ -16,7 +18,7 @@ import Chat from './pages/Chat';
 import ChatDialog from './pages/ChatDialog';
 import Profile from './pages/Profile';
 
-function AuthFlow({ onLogin }) {
+function AuthFlow({ onLogin, onResetVerified }) {
   const [view, setView] = useState('auth');
   const [pendingEmail, setPendingEmail] = useState('');
 
@@ -25,19 +27,30 @@ function AuthFlow({ onLogin }) {
     setView('otp');
   };
 
-  const handleOtpSuccess = (res) => {
-    onLogin(res);
-  };
-
   if (view === 'otp') {
-    return <OtpPage email={pendingEmail} onSuccess={handleOtpSuccess} onBack={() => setView('auth')} />;
+    return <OtpPage email={pendingEmail} onSuccess={onLogin} onBack={() => setView('auth')} />;
   }
-  return <AuthPage onOtpSent={handleOtpSent} onLogin={onLogin} />;
+  if (view === 'forgot') {
+    return (
+      <ForgotPasswordPage
+        onBack={() => setView('auth')}
+        onVerified={(authResponse) => onResetVerified(authResponse)}
+      />
+    );
+  }
+  return (
+    <AuthPage
+      onOtpSent={handleOtpSent}
+      onLogin={onLogin}
+      onForgotPassword={() => setView('forgot')}
+    />
+  );
 }
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [checked, setChecked] = useState(false);
+  const [needsPasswordChange, setNeedsPasswordChange] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -45,8 +58,6 @@ export default function App() {
     const saved = localStorage.getItem('user');
 
     if (saved && refreshToken) {
-      // Есть refresh token — пользователь остаётся залогиненным.
-      // Если access token истёк, первый API-запрос тихо обновит его.
       setUser(JSON.parse(saved));
     } else if (saved && token && !isTokenExpired(token)) {
       setUser(JSON.parse(saved));
@@ -59,8 +70,15 @@ export default function App() {
   }, []);
 
   const handleLogin = (userData) => {
+    localStorage.setItem('token', userData.token);
+    localStorage.setItem('refreshToken', userData.refreshToken);
     localStorage.setItem('user', JSON.stringify({ id: userData.id, email: userData.email, role: userData.role }));
     setUser(userData);
+  };
+
+  const handleResetVerified = (authResponse) => {
+    handleLogin(authResponse);
+    setNeedsPasswordChange(true);
   };
 
   const handleLogout = () => {
@@ -71,6 +89,7 @@ export default function App() {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     setUser(null);
+    setNeedsPasswordChange(false);
   };
 
   useEffect(() => {
@@ -87,7 +106,7 @@ export default function App() {
   if (!user) {
     return (
       <>
-        <AuthFlow onLogin={handleLogin} />
+        <AuthFlow onLogin={handleLogin} onResetVerified={handleResetVerified} />
         <Toaster position="top-center" richColors />
       </>
     );
@@ -107,6 +126,15 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Layout>
+
+        <NewPasswordModal
+          open={needsPasswordChange}
+          onSuccess={() => {
+            setNeedsPasswordChange(false);
+            toast.success('Пароль успешно изменён!');
+          }}
+        />
+
         <Toaster position="top-center" richColors />
       </BrowserRouter>
     </MarketProvider>
