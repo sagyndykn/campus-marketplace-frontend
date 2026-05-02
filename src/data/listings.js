@@ -9,4 +9,6 @@ export const CATEGORY_LABELS = {
   OTHER: 'Другое',
 };
 
-export const CATEGORIES = Object.entries(CATEGORY_LABELS).map(([value, label]) => ({ value, label }));
+export const CATEGORY_VALUES = Object.keys(CATEGORY_LABELS);
+
+export const CATEGORIES = CATEGORY_VALUES.map((value) => ({ value, label: CATEGORY_LABELS[value] }));

@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, KeyRound } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { forgotPassword, verifyResetOtp } from '../../api/auth';
 
 const RESET_TTL = 300;
 
 export default function ForgotPasswordPage({ onBack, onVerified }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState('email'); // 'email' | 'otp'
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(Array(6).fill(''));
@@ -80,7 +82,7 @@ export default function ForgotPasswordPage({ onBack, onVerified }) {
   const handleVerify = async (e) => {
     e.preventDefault();
     const code = otp.join('');
-    if (code.length !== 6) { setError('Введите 6-значный код'); return; }
+    if (code.length !== 6) { setError(t('otp.error6digits')); return; }
     setError('');
     setLoading(true);
     try {
@@ -98,15 +100,15 @@ export default function ForgotPasswordPage({ onBack, onVerified }) {
   const otpFilled = otp.join('').length === 6;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #e4e9f7 100%)' }}>
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-slate-200 dark:from-slate-950 dark:to-gray-900">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md p-8">
 
         <button
           type="button"
           onClick={step === 'otp' ? () => { setStep('email'); setOtp(Array(6).fill('')); } : onBack}
           className="btn-back flex items-center gap-1 text-sm mb-6"
         >
-          <ChevronLeft size={16} /> Назад
+          <ChevronLeft size={16} /> {t('otp.back')}
         </button>
 
         <div className="text-center mb-8">
@@ -115,12 +117,12 @@ export default function ForgotPasswordPage({ onBack, onVerified }) {
             <KeyRound size={26} style={{ color: 'var(--primary)' }} />
           </div>
           <h2 className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>
-            {step === 'email' ? 'Восстановление пароля' : 'Введите код'}
+            {step === 'email' ? t('forgotPwd.title') : t('forgotPwd.otpTitle')}
           </h2>
           <p className="text-sm mt-2 text-gray-400">
             {step === 'email'
-              ? 'Введите email — мы отправим код подтверждения'
-              : <>Код отправлен на<br /><span className="font-semibold" style={{ color: 'var(--text)' }}>{email}</span></>
+              ? t('forgotPwd.emailDesc')
+              : <>{t('forgotPwd.otpDesc')}<br /><span className="font-semibold" style={{ color: 'var(--text)' }}>{email}</span></>
             }
           </p>
         </div>
@@ -128,18 +130,18 @@ export default function ForgotPasswordPage({ onBack, onVerified }) {
         {step === 'email' ? (
           <form onSubmit={handleSendOtp} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Email</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>{t('auth.email')}</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="example@sdu.edu.kz"
+                placeholder={t('auth.emailPlaceholder')}
                 pattern="[a-zA-Z0-9._%+\-]+@sdu\.edu\.kz"
                 className="input-field"
                 autoFocus
               />
-              <p className="text-xs text-gray-400 mt-1">Только почта @sdu.edu.kz</p>
+              <p className="text-xs text-gray-400 mt-1">{t('auth.emailHint')}</p>
             </div>
 
             {error && (
@@ -150,7 +152,7 @@ export default function ForgotPasswordPage({ onBack, onVerified }) {
 
             <button type="submit" disabled={loading}
               className="btn-primary w-full font-medium py-2.5 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
-              {loading ? 'Отправка...' : 'Отправить код'}
+              {loading ? t('forgotPwd.sending') : t('forgotPwd.sendCode')}
             </button>
           </form>
         ) : (
@@ -179,7 +181,7 @@ export default function ForgotPasswordPage({ onBack, onVerified }) {
             <div className="text-center h-5">
               {timeLeft > 0 ? (
                 <p className="text-sm text-gray-400">
-                  Код действует{' '}
+                  {t('otp.codeValid')}{' '}
                   <span className="font-semibold" style={{ color: timeLeft <= 60 ? 'var(--accent)' : 'var(--primary)' }}>
                     {formatTime(timeLeft)}
                   </span>
@@ -187,7 +189,7 @@ export default function ForgotPasswordPage({ onBack, onVerified }) {
               ) : (
                 <button type="button" onClick={handleResend} disabled={resending}
                   className="btn-link text-sm font-medium disabled:opacity-50">
-                  {resending ? 'Отправка...' : 'Отправить код снова'}
+                  {resending ? t('otp.sending') : t('otp.resend')}
                 </button>
               )}
             </div>
@@ -200,7 +202,7 @@ export default function ForgotPasswordPage({ onBack, onVerified }) {
 
             <button type="submit" disabled={loading || !otpFilled}
               className="btn-primary w-full font-medium py-2.5 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
-              {loading ? 'Проверка...' : 'Подтвердить код'}
+              {loading ? t('forgotPwd.confirming') : t('forgotPwd.confirmCode')}
             </button>
           </form>
         )}

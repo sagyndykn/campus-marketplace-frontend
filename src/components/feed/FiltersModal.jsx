@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function FiltersModal({ open, onClose, filters, onApply }) {
+  const { t } = useTranslation();
   const [local, setLocal] = useState(filters);
 
   useEffect(() => {
@@ -38,24 +40,24 @@ export default function FiltersModal({ open, onClose, filters, onApply }) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 p-6 max-h-[80vh] overflow-y-auto"
+            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 rounded-t-2xl z-50 p-6 max-h-[80vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold" style={{ color: 'var(--primary)' }}>Фильтры</h2>
+              <h2 className="text-lg font-bold" style={{ color: 'var(--primary)' }}>{t('filters.title')}</h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
               >
                 <X size={18} style={{ color: 'var(--text)' }} />
               </button>
             </div>
 
             <div className="mb-5">
-              <p className="text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>Цена (₸)</p>
+              <p className="text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>{t('filters.price')}</p>
               <div className="flex gap-3">
                 <input
                   type="number"
-                  placeholder="От"
+                  placeholder={t('filters.from')}
                   value={local.minPrice}
                   onChange={(e) => setLocal((p) => ({ ...p, minPrice: e.target.value }))}
                   className="input-field flex-1"
@@ -63,7 +65,7 @@ export default function FiltersModal({ open, onClose, filters, onApply }) {
                 />
                 <input
                   type="number"
-                  placeholder="До"
+                  placeholder={t('filters.to')}
                   value={local.maxPrice}
                   onChange={(e) => setLocal((p) => ({ ...p, maxPrice: e.target.value }))}
                   className="input-field flex-1"
@@ -86,7 +88,7 @@ export default function FiltersModal({ open, onClose, filters, onApply }) {
                   />
                 </button>
                 <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>
-                  Только с фото
+                  {t('filters.onlyWithPhoto')}
                 </span>
               </label>
             </div>
@@ -94,16 +96,16 @@ export default function FiltersModal({ open, onClose, filters, onApply }) {
             <div className="flex gap-3">
               <button
                 onClick={handleReset}
-                className="flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors hover:bg-gray-50"
+                className="flex-1 py-2.5 rounded-lg border text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               >
-                Сбросить
+                {t('filters.reset')}
               </button>
               <button
                 onClick={handleApply}
                 className="flex-1 btn-primary py-2.5 rounded-lg text-sm font-medium"
               >
-                Применить
+                {t('filters.apply')}
               </button>
             </div>
           </motion.div>

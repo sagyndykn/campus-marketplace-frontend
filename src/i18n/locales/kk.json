@@ -1,0 +1,170 @@
+{
+  "nav": {
+    "market": "Маркет",
+    "wishlist": "Таңдалғандар",
+    "chat": "Чат",
+    "profile": "Профиль",
+    "add": "+ Қосу"
+  },
+  "auth": {
+    "login": "Кіру",
+    "register": "Тіркелу",
+    "email": "Email",
+    "password": "Құпия сөз",
+    "firstName": "Аты",
+    "lastName": "Тегі",
+    "emailPlaceholder": "example@sdu.edu.kz",
+    "emailHint": "Тек @sdu.edu.kz поштасы",
+    "passwordPlaceholder": "Құпия сөзіңіз",
+    "passwordMinHint": "Кемінде 6 таңба",
+    "forgotPassword": "Құпия сөзді ұмыттыңыз ба?",
+    "submitLogin": "Кіру",
+    "submitRegister": "Тіркелу",
+    "loading": "Күте тұрыңыз..."
+  },
+  "otp": {
+    "title": "Email-ді растаңыз",
+    "subtitle": "Біз 6 таңбалы кодты жібердік",
+    "back": "Артқа",
+    "codeValid": "Кодтың қолданылу уақыты",
+    "resend": "Кодты қайта жіберу",
+    "sending": "Жіберілуде...",
+    "verify": "Растау",
+    "verifying": "Тексерілуде...",
+    "error6digits": "6 таңбалы кодты енгізіңіз"
+  },
+  "forgotPwd": {
+    "title": "Құпия сөзді қалпына келтіру",
+    "otpTitle": "Кодты енгізіңіз",
+    "emailDesc": "Email-іңізді енгізіңіз — код жібереміз",
+    "otpDesc": "Код жіберілді",
+    "sendCode": "Код жіберу",
+    "sending": "Жіберілуде...",
+    "confirmCode": "Кодты растау",
+    "confirming": "Тексерілуде..."
+  },
+  "newPwd": {
+    "title": "Жаңа құпия сөз ойлаңыз",
+    "subtitle": "Растау үшін құпия сөзді екі рет енгізіңіз",
+    "newPassword": "Жаңа құпия сөз",
+    "confirmPassword": "Құпия сөзді қайталаңыз",
+    "placeholder": "Кемінде 6 таңба",
+    "confirmPlaceholder": "Құпия сөзді қайта енгізіңіз",
+    "mismatch": "Құпия сөздер сәйкес емес",
+    "save": "Сақтау",
+    "saving": "Сақталуда...",
+    "minLength": "Құпия сөз кемінде 6 таңбадан тұруы керек"
+  },
+  "feed": {
+    "search": "Не іздейсіз?",
+    "filters": "Сүзгілер",
+    "allCategories": "Барлық санаттар",
+    "found": "Табылды: {{count}}",
+    "notFound": "Ештеңе табылмады",
+    "noResultsTitle": "Ештеңе табылмады",
+    "noResultsDesc": "Сүзгілерді немесе іздеу сұрауын өзгертіп көріңіз"
+  },
+  "sort": {
+    "recommended": "Ұсынылған",
+    "newest": "Жаңалары",
+    "cheapest": "Арзандары",
+    "expensive": "Қымбаттары"
+  },
+  "view": {
+    "swipe": "Сырғыту",
+    "gallery": "Галерея",
+    "list": "Тізім",
+    "tile": "Плитка"
+  },
+  "filters": {
+    "title": "Сүзгілер",
+    "price": "Баға (₸)",
+    "from": "Бастап",
+    "to": "Дейін",
+    "onlyWithPhoto": "Тек фотосы барлар",
+    "reset": "Тазалау",
+    "apply": "Қолдану"
+  },
+  "listing": {
+    "anonymous": "Анонимді",
+    "write": "Жазу"
+  },
+  "swipe": {
+    "like": "ҰНАТУ",
+    "skip": "ӨТКІЗУ",
+    "allViewed": "Бәрі қаралды!",
+    "viewedAll": "Барлық хабарландырулар қаралды",
+    "viewAgain": "Қайта қарау"
+  },
+  "wishlist": {
+    "title": "Таңдаулылар",
+    "count": "Хабарландырулар ({{count}})",
+    "clear": "Таңдаулыларды тазалау",
+    "added": "Таңдаулыларға қосылды",
+    "failUpdate": "Таңдаулыларды жаңарту мүмкін болмады"
+  },
+  "emptyState": {
+    "title": "Таңдаулы хабарландырулар жоқ",
+    "desc": "Таңдаулыларға қосу үшін хабарландыруларды оңға сырғытыңыз",
+    "go": "Хабарландыруларға өту"
+  },
+  "addListing": {
+    "title": "Жаңа хабарландыру",
+    "name": "Атауы",
+    "namePlaceholder": "Не сатасыз?",
+    "description": "Сипаттама",
+    "descPlaceholder": "Тауарды толығырақ сипаттаңыз...",
+    "price": "Баға (₸)",
+    "category": "Санат",
+    "selectCategory": "Санатты таңдаңыз",
+    "photos": "Суреттер",
+    "photosHint": "(5-ке дейін)",
+    "publish": "Хабарландыруды жариялау",
+    "publishing": "Жарияланып жатыр...",
+    "success": "Хабарландыру жарияланды!"
+  },
+  "profile": {
+    "personalData": "Жеке деректер",
+    "firstName": "Аты",
+    "lastName": "Тегі",
+    "phone": "Телефон",
+    "phonePlaceholder": "+7 (XXX) XXX-XX-XX",
+    "save": "Сақтау",
+    "saved": "Сақталды",
+    "myListings": "Менің хабарландыруларым",
+    "noListings": "Сіз әлі ештеңе орналастырмадыңыз",
+    "settings": "Параметрлер",
+    "darkMode": "Қараңғы тақырып",
+    "notifications": "Хабарландырулар",
+    "logout": "Шығу",
+    "admin": "Әкімші",
+    "language": "Тіл"
+  },
+  "chat": {
+    "title": "Хабарлар",
+    "searchPlaceholder": "Аты немесе email бойынша іздеу...",
+    "noUsers": "Пайдаланушылар табылмады",
+    "write": "Жазу",
+    "noConversations": "Хабарлар жоқ",
+    "noConversationsDesc": "Жоғарыдан пайдаланушы табыңыз немесе хабарландырудағы «Жазу» батырмасын басыңыз",
+    "startConversation": "Диалог бастаңыз — алғашқы хабарды жіберіңіз",
+    "messagePlaceholder": "Хабар...",
+    "online": "Желіде",
+    "noMessages": "Хабарлар жоқ",
+    "waitingUpload": "Күте тұрыңыз, файл жүктелуде",
+    "presenceToday": "бүгін {{time}} болды",
+    "presenceYesterday": "кеше {{time}} болды",
+    "presenceDate": "{{date}} күні {{time}} болды",
+    "presenceOffline": "желіден тыс"
+  },
+  "categories": {
+    "ELECTRONICS": "Электроника",
+    "CLOTHING": "Киім",
+    "HOME_AND_GARDEN": "Үй және бақша",
+    "AUTO": "Автомобиль",
+    "SPORTS": "Спорт",
+    "BOOKS": "Кітаптар",
+    "GAMES": "Ойындар",
+    "OTHER": "Басқалары"
+  }
+}

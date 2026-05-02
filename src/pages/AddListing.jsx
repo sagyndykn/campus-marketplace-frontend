@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusCircle, Loader, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { createListing, uploadListingPhotos } from '../api/listings';
-import { CATEGORIES } from '../data/listings';
+import { CATEGORY_VALUES } from '../data/listings';
 import { toast } from 'sonner';
 
 export default function AddListing() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [form, setForm] = useState({ title: '', description: '', price: '', category: '' });
   const [photos, setPhotos] = useState([]);
@@ -40,7 +42,7 @@ export default function AddListing() {
       if (photos.length > 0) {
         await uploadListingPhotos(listing.id, photos);
       }
-      toast.success('Объявление опубликовано!');
+      toast.success(t('addListing.success'));
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -53,47 +55,47 @@ export default function AddListing() {
     <div className="max-w-lg mx-auto px-4 py-6">
       <div className="flex items-center gap-2 mb-6">
         <PlusCircle size={22} style={{ color: 'var(--primary)' }} />
-        <h1 className="text-xl font-bold" style={{ color: 'var(--primary)' }}>Новое объявление</h1>
+        <h1 className="text-xl font-bold" style={{ color: 'var(--primary)' }}>{t('addListing.title')}</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Название</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>{t('addListing.name')}</label>
           <input type="text" required value={form.title} onChange={set('title')}
-            placeholder="Что продаёте?" className="input-field" />
+            placeholder={t('addListing.namePlaceholder')} className="input-field" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Описание</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>{t('addListing.description')}</label>
           <textarea required value={form.description} onChange={set('description')}
-            placeholder="Опишите товар подробнее..." rows={3}
+            placeholder={t('addListing.descPlaceholder')} rows={3}
             className="input-field resize-none" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Цена (₸)</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>{t('addListing.price')}</label>
           <input type="number" required min={0} value={form.price} onChange={set('price')}
             placeholder="0" className="input-field" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>Категория</label>
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>{t('addListing.category')}</label>
           <select required value={form.category} onChange={set('category')} className="input-field">
-            <option value="">Выберите категорию</option>
-            {CATEGORIES.map(({ value, label }) => (
-              <option key={value} value={value}>{label}</option>
+            <option value="">{t('addListing.selectCategory')}</option>
+            {CATEGORY_VALUES.map((val) => (
+              <option key={val} value={val}>{t('categories.' + val)}</option>
             ))}
           </select>
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
-            Фото <span className="text-gray-400 font-normal">(до 5 штук)</span>
+            {t('addListing.photos')} <span className="text-gray-400 font-normal">{t('addListing.photosHint')}</span>
           </label>
           <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handlePhotos} />
           <div className="flex flex-wrap gap-2">
             {photos.map((file, i) => (
-              <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+              <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                 <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
                 <button type="button" onClick={() => removePhoto(i)}
                   className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/50 flex items-center justify-center text-white">
@@ -119,7 +121,7 @@ export default function AddListing() {
 
         <button type="submit" disabled={!isValid || loading}
           className="btn-primary w-full font-medium py-3 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-          {loading ? <><Loader size={16} className="animate-spin" /> Публикация...</> : 'Опубликовать объявление'}
+          {loading ? <><Loader size={16} className="animate-spin" /> {t('addListing.publishing')}</> : t('addListing.publish')}
         </button>
       </form>
     </div>

@@ -1,11 +1,11 @@
 function GridSkeleton() {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 animate-pulse">
-      <div className="h-44 bg-gray-100" />
+    <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 animate-pulse">
+      <div className="h-44 bg-gray-100 dark:bg-gray-800" />
       <div className="p-3 space-y-2">
-        <div className="h-3 bg-gray-100 rounded-full w-16" />
-        <div className="h-4 bg-gray-100 rounded w-3/4" />
-        <div className="h-4 bg-gray-100 rounded w-1/3" />
+        <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full w-16" />
+        <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-3/4" />
+        <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-1/3" />
       </div>
     </div>
   );
@@ -13,13 +13,13 @@ function GridSkeleton() {
 
 function ListSkeleton() {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 animate-pulse flex">
-      <div className="flex-shrink-0 bg-gray-100" style={{ width: 150, height: 120 }} />
+    <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 animate-pulse flex">
+      <div className="flex-shrink-0 bg-gray-100 dark:bg-gray-800" style={{ width: 150, height: 120 }} />
       <div className="flex-1 p-3 space-y-2">
-        <div className="h-3 bg-gray-100 rounded-full w-16" />
-        <div className="h-4 bg-gray-100 rounded w-3/4" />
-        <div className="h-3 bg-gray-100 rounded w-1/2" />
-        <div className="h-4 bg-gray-100 rounded w-20 mt-3" />
+        <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full w-16" />
+        <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-3/4" />
+        <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-1/2" />
+        <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-20 mt-3" />
       </div>
     </div>
   );
@@ -27,11 +27,11 @@ function ListSkeleton() {
 
 function TileSkeleton() {
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 animate-pulse">
-      <div className="h-24 bg-gray-100" />
+    <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 animate-pulse">
+      <div className="h-24 bg-gray-100 dark:bg-gray-800" />
       <div className="p-2 space-y-1.5">
-        <div className="h-3 bg-gray-100 rounded w-full" />
-        <div className="h-3 bg-gray-100 rounded w-14" />
+        <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-full" />
+        <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-14" />
       </div>
     </div>
   );
@@ -42,10 +42,10 @@ function SwipeSkeleton() {
     <div className="max-w-sm mx-auto px-4 py-4">
       <div className="flex justify-center gap-1.5 mb-6">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-1.5 rounded-full bg-gray-100 animate-pulse" style={{ width: i === 0 ? 24 : 8 }} />
+          <div key={i} className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse" style={{ width: i === 0 ? 24 : 8 }} />
         ))}
       </div>
-      <div className="bg-gray-100 rounded-2xl animate-pulse" style={{ height: 460 }} />
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl animate-pulse" style={{ height: 460 }} />
     </div>
   );
 }

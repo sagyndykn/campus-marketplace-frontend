@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Mail } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { verifyOtp, resendOtp } from '../../api/auth';
 
 const OTP_TTL = 120;
 
 export default function OtpPage({ email, onSuccess, onBack }) {
+  const { t } = useTranslation();
   const [otp, setOtp] = useState(Array(6).fill(''));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,7 +48,7 @@ export default function OtpPage({ email, onSuccess, onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const code = otp.join('');
-    if (code.length !== 6) { setError('Введите 6-значный код'); return; }
+    if (code.length !== 6) { setError(t('otp.error6digits')); return; }
     setError('');
     setLoading(true);
     try {
@@ -82,20 +84,20 @@ export default function OtpPage({ email, onSuccess, onBack }) {
   const filled = otp.join('').length === 6;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #e4e9f7 100%)' }}>
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-slate-200 dark:from-slate-950 dark:to-gray-900">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md p-8">
 
         <button type="button" onClick={onBack} className="btn-back flex items-center gap-1 text-sm mb-6">
-          <ChevronLeft size={16} /> Назад
+          <ChevronLeft size={16} /> {t('otp.back')}
         </button>
 
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl mb-4" style={{ backgroundColor: 'var(--bg-light)' }}>
             <Mail size={26} style={{ color: 'var(--primary)' }} />
           </div>
-          <h2 className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>Подтвердите email</h2>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>{t('otp.title')}</h2>
           <p className="text-sm mt-2 text-gray-400">
-            Мы отправили 6-значный код на<br />
+            {t('otp.subtitle')}<br />
             <span className="font-semibold" style={{ color: 'var(--text)' }}>{email}</span>
           </p>
         </div>
@@ -120,7 +122,7 @@ export default function OtpPage({ email, onSuccess, onBack }) {
           <div className="text-center mb-5 h-5">
             {timeLeft > 0 ? (
               <p className="text-sm text-gray-400">
-                Код действует{' '}
+                {t('otp.codeValid')}{' '}
                 <span className="font-semibold" style={{ color: timeLeft <= 30 ? 'var(--accent)' : 'var(--primary)' }}>
                   {formatTime(timeLeft)}
                 </span>
@@ -128,7 +130,7 @@ export default function OtpPage({ email, onSuccess, onBack }) {
             ) : (
               <button type="button" onClick={handleResend} disabled={resending}
                 className="btn-link text-sm font-medium disabled:opacity-50">
-                {resending ? 'Отправка...' : 'Отправить код снова'}
+                {resending ? t('otp.sending') : t('otp.resend')}
               </button>
             )}
           </div>
@@ -141,7 +143,7 @@ export default function OtpPage({ email, onSuccess, onBack }) {
 
           <button type="submit" disabled={loading || !filled}
             className="btn-primary w-full font-medium py-2.5 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
-            {loading ? 'Проверка...' : 'Подтвердить'}
+            {loading ? t('otp.verifying') : t('otp.verify')}
           </button>
         </form>
       </div>

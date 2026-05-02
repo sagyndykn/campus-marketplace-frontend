@@ -3,26 +3,29 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { ChevronLeft, Send, Loader, Paperclip, X, Play } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { getMessages, getPresence, getWsUrl, uploadChatMedia } from '../api/chat';
 import { toast } from 'sonner';
 
-function formatTime(isoString) {
+function formatMsgTime(isoString, lng) {
   if (!isoString) return '';
-  return new Date(isoString).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  return new Date(isoString).toLocaleTimeString(lng === 'en' ? 'en-GB' : 'ru-RU', { hour: '2-digit', minute: '2-digit' });
 }
 
-function formatLastSeen(isoString) {
-  if (!isoString) return 'не в сети';
+function formatLastSeen(isoString, t, lng) {
+  if (!isoString) return t('chat.presenceOffline');
   const d = new Date(isoString);
   const now = new Date();
   const isToday = d.toDateString() === now.toDateString();
   const yesterday = new Date(now);
   yesterday.setDate(now.getDate() - 1);
   const isYesterday = d.toDateString() === yesterday.toDateString();
-  const time = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-  if (isToday) return `был(а) сегодня в ${time}`;
-  if (isYesterday) return `был(а) вчера в ${time}`;
-  return `был(а) ${d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })} в ${time}`;
+  const locale = lng === 'en' ? 'en-GB' : 'ru-RU';
+  const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+  if (isToday) return t('chat.presenceToday', { time });
+  if (isYesterday) return t('chat.presenceYesterday', { time });
+  const date = d.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+  return t('chat.presenceDate', { date, time });
 }
 
 function isVideo(url) {
@@ -71,6 +74,7 @@ function MediaItem({ url }) {
 }
 
 export default function ChatDialog() {
+  const { t, i18n } = useTranslation();
   const { id: conversationId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,6 +91,7 @@ export default function ChatDialog() {
   const clientRef = useRef(null);
   const bottomRef = useRef(null);
   const myId = JSON.parse(localStorage.getItem('user') || '{}').id;
+  const lng = i18n.language?.slice(0, 2);
 
   useEffect(() => {
     getMessages(conversationId)
@@ -160,7 +165,7 @@ export default function ChatDialog() {
     const hasMedia = mediaPreview?.url;
     if ((!content && !hasMedia) || !clientRef.current?.connected) return;
     if (mediaPreview?.uploading) {
-      toast.error('Подождите, файл ещё загружается');
+      toast.error(t('chat.waitingUpload'));
       return;
     }
 
@@ -186,7 +191,7 @@ export default function ChatDialog() {
   };
 
   const presenceLabel = presence
-    ? presence.online ? 'В сети' : formatLastSeen(presence.lastSeenAt)
+    ? presence.online ? t('chat.online') : formatLastSeen(presence.lastSeenAt, t, lng)
     : '...';
   const presenceDot = presence?.online ? '#10b981' : '#d1d5db';
 
@@ -194,17 +199,17 @@ export default function ChatDialog() {
 
   if (loading) {
     return (
-      <div className="fixed inset-x-0 top-0 bottom-20 md:top-16 md:bottom-0 flex items-center justify-center bg-white">
+      <div className="fixed inset-x-0 top-0 bottom-20 md:top-16 md:bottom-0 flex items-center justify-center bg-white dark:bg-gray-950">
         <Loader size={28} className="animate-spin" style={{ color: 'var(--primary)' }} />
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-x-0 top-0 bottom-20 md:top-16 md:bottom-0 flex flex-col bg-white">
-      <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 shrink-0">
+    <div className="fixed inset-x-0 top-0 bottom-20 md:top-16 md:bottom-0 flex flex-col bg-white dark:bg-gray-950">
+      <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shrink-0">
         <button onClick={() => navigate('/chat')}
-          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
           <ChevronLeft size={20} style={{ color: 'var(--text)' }} />
         </button>
         <div className="flex-1 min-w-0">
@@ -222,10 +227,10 @@ export default function ChatDialog() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2" style={{ backgroundColor: '#f8fafc' }}>
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2 bg-slate-50 dark:bg-slate-950">
         {messages.length === 0 && (
           <p className="text-center text-sm py-8" style={{ color: '#9ca3af' }}>
-            Начните диалог — напишите первое сообщение
+            {t('chat.startConversation')}
           </p>
         )}
         {messages.map((msg) => (
@@ -252,7 +257,7 @@ export default function ChatDialog() {
               )}
               {msg.content && (
                 <div className={`px-3.5 py-2 rounded-2xl text-sm leading-relaxed ${
-                  msg.mine ? 'rounded-br-sm' : 'rounded-bl-sm bg-white border border-gray-200'
+                  msg.mine ? 'rounded-br-sm' : 'rounded-bl-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700'
                 }`}
                   style={msg.mine ? { backgroundColor: 'var(--primary)', color: '#fff' } : { color: 'var(--text)' }}>
                   {msg.content}
@@ -260,7 +265,7 @@ export default function ChatDialog() {
               )}
               <p className={`text-[10px] mt-1 ${msg.mine ? 'text-right' : 'text-left'}`}
                 style={{ color: '#9ca3af' }}>
-                {formatTime(msg.sentAt)}
+                {formatMsgTime(msg.sentAt, lng)}
               </p>
             </div>
           </div>
@@ -269,7 +274,7 @@ export default function ChatDialog() {
       </div>
 
       {mediaPreview && (
-        <div className="px-4 pt-3 bg-white border-t border-gray-100 shrink-0">
+        <div className="px-4 pt-3 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shrink-0">
           <div className="relative inline-block">
             {isVideo(mediaPreview.file?.name || '') ? (
               <div className="w-20 h-20 rounded-xl bg-gray-200 flex items-center justify-center">
@@ -297,7 +302,7 @@ export default function ChatDialog() {
         </div>
       )}
 
-      <div className="px-4 py-3 bg-white border-t border-gray-200 shrink-0 flex items-end gap-2">
+      <div className="px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shrink-0 flex items-end gap-2">
         <input
           ref={fileInputRef}
           type="file"
@@ -307,7 +312,7 @@ export default function ChatDialog() {
         />
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all hover:bg-gray-100"
+          className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all hover:bg-gray-100 dark:hover:bg-gray-800"
           style={{ border: '1.5px solid var(--border)' }}
         >
           <Paperclip size={17} style={{ color: '#6b7280' }} />
@@ -316,14 +321,14 @@ export default function ChatDialog() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Сообщение..."
+          placeholder={t('chat.messagePlaceholder')}
           rows={1}
           className="flex-1 resize-none rounded-xl px-4 py-2.5 text-sm outline-none transition-all"
           style={{
             border: '1.5px solid var(--border)',
             maxHeight: 120,
             color: 'var(--text)',
-            backgroundColor: '#f8fafc',
+            backgroundColor: 'var(--surface-muted)',
           }}
           onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; }}
           onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }}
