@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { TileCard } from './ListingCard';
 
-export default function ListingTileGrid({ items, favoritedIds, onFavoriteToggle, onChat }) {
+const EMPTY_FAVORITES = new Set();
+
+export default function ListingTileGrid({ items, favoritedIds = EMPTY_FAVORITES, onFavoriteToggle, onChat }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
       {items.map((listing, i) => (

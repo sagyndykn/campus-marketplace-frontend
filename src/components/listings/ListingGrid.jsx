@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { GalleryCard } from './ListingCard';
 
-export default function ListingGrid({ items, favoritedIds, onFavoriteToggle, onChat }) {
+const EMPTY_FAVORITES = new Set();
+
+export default function ListingGrid({ items, favoritedIds = EMPTY_FAVORITES, onFavoriteToggle, onChat }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {items.map((listing, i) => (

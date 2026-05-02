@@ -1,11 +1,15 @@
 import { Heart, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { handleListingCardKeyDown, useListingNavigation } from '../../hooks/useListingNavigation';
 
 function HeartButton({ isFavorited, onClick, size = 'md' }) {
+  if (!onClick) return null;
+
   const dim = size === 'sm' ? 'w-6 h-6' : 'w-8 h-8';
   const iconSize = size === 'sm' ? 11 : 15;
   return (
     <button
+      type="button"
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       className={`${dim} rounded-full bg-white dark:bg-gray-800 shadow flex items-center justify-center transition-transform hover:scale-110 active:scale-95 flex-shrink-0`}
     >
@@ -20,10 +24,15 @@ function HeartButton({ isFavorited, onClick, size = 'md' }) {
 
 export function GalleryCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
   const { t } = useTranslation();
+  const openListing = useListingNavigation(listing);
+
   return (
     <div
       className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow group cursor-pointer"
-      onClick={() => onChat?.(listing)}
+      onClick={openListing}
+      onKeyDown={(e) => handleListingCardKeyDown(e, openListing)}
+      role="link"
+      tabIndex={0}
     >
       <div className="relative overflow-hidden" style={{ height: 180, backgroundColor: 'var(--bg-light)' }}>
         {listing.photoUrls?.length > 0 ? (
@@ -36,7 +45,10 @@ export function GalleryCard({ listing, isFavorited, onFavoriteToggle, onChat }) 
           <div className="w-full h-full flex items-center justify-center text-3xl opacity-20 select-none">📦</div>
         )}
         <div className="absolute top-2 right-2 z-10">
-          <HeartButton isFavorited={isFavorited} onClick={() => onFavoriteToggle(listing)} />
+          <HeartButton
+            isFavorited={isFavorited}
+            onClick={onFavoriteToggle ? () => onFavoriteToggle(listing) : undefined}
+          />
         </div>
       </div>
       <div className="p-3">
@@ -68,6 +80,7 @@ export function GalleryCard({ listing, isFavorited, onFavoriteToggle, onChat }) 
           </div>
           {onChat && (
             <button
+              type="button"
               onClick={(e) => { e.stopPropagation(); onChat(listing); }}
               className="ml-1 flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               style={{ color: 'var(--primary)' }}
@@ -83,12 +96,19 @@ export function GalleryCard({ listing, isFavorited, onFavoriteToggle, onChat }) 
 
 export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
   const { t } = useTranslation();
+  const openListing = useListingNavigation(listing);
+
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow flex group cursor-pointer">
+    <div
+      className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow flex group cursor-pointer"
+      onClick={openListing}
+      onKeyDown={(e) => handleListingCardKeyDown(e, openListing)}
+      role="link"
+      tabIndex={0}
+    >
       <div
         className="flex-shrink-0 overflow-hidden"
         style={{ width: 150, backgroundColor: 'var(--bg-light)' }}
-        onClick={() => onChat?.(listing)}
       >
         {listing.photoUrls?.length > 0 ? (
           <img
@@ -108,7 +128,6 @@ export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
       </div>
       <div
         className="flex-1 p-3 flex flex-col justify-between min-w-0"
-        onClick={() => onChat?.(listing)}
       >
         <div>
           <div className="flex items-start justify-between gap-2">
@@ -123,7 +142,10 @@ export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
                 {listing.title}
               </h3>
             </div>
-            <HeartButton isFavorited={isFavorited} onClick={() => onFavoriteToggle(listing)} />
+            <HeartButton
+              isFavorited={isFavorited}
+              onClick={onFavoriteToggle ? () => onFavoriteToggle(listing) : undefined}
+            />
           </div>
           <p className="text-xs text-gray-400 mt-1 line-clamp-1">{listing.description}</p>
         </div>
@@ -137,6 +159,7 @@ export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
             </span>
             {onChat && (
               <button
+                type="button"
                 onClick={(e) => { e.stopPropagation(); onChat(listing); }}
                 className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium transition-colors"
                 style={{ backgroundColor: 'var(--bg-light)', color: 'var(--primary)' }}
@@ -152,10 +175,15 @@ export function ListCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
 }
 
 export function TileCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
+  const openListing = useListingNavigation(listing);
+
   return (
     <div
       className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 hover:shadow-md transition-shadow group cursor-pointer"
-      onClick={() => onChat?.(listing)}
+      onClick={openListing}
+      onKeyDown={(e) => handleListingCardKeyDown(e, openListing)}
+      role="link"
+      tabIndex={0}
     >
       <div className="relative overflow-hidden" style={{ height: 110, backgroundColor: 'var(--bg-light)' }}>
         {listing.photoUrls?.length > 0 ? (
@@ -168,7 +196,11 @@ export function TileCard({ listing, isFavorited, onFavoriteToggle, onChat }) {
           <div className="w-full h-full flex items-center justify-center text-2xl opacity-20 select-none">📦</div>
         )}
         <div className="absolute top-1 right-1 z-10">
-          <HeartButton isFavorited={isFavorited} onClick={() => onFavoriteToggle(listing)} size="sm" />
+          <HeartButton
+            isFavorited={isFavorited}
+            onClick={onFavoriteToggle ? () => onFavoriteToggle(listing) : undefined}
+            size="sm"
+          />
         </div>
       </div>
       <div className="p-2">

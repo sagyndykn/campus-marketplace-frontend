@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { ListCard } from './ListingCard';
 
-export default function ListingList({ items, favoritedIds, onFavoriteToggle, onChat }) {
+const EMPTY_FAVORITES = new Set();
+
+export default function ListingList({ items, favoritedIds = EMPTY_FAVORITES, onFavoriteToggle, onChat }) {
   return (
     <div className="flex flex-col gap-3">
       {items.map((listing, i) => (
