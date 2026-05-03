@@ -12,12 +12,19 @@ SDU University students lack a dedicated platform to trade items within the camp
 
 ## Features
 
-- **Swipe feed** — browse listings with swipe-left / swipe-right interaction
-- **Create listing** — post items for sale with photos, price, and category
-- **User profile** — view and edit personal info, upload avatar, see own listings
+- **Swipe feed** — smooth Tinder-style swipe with drag, velocity threshold, and spring snap-back
+- **4 view modes** — gallery, list, tile, and swipe
+- **Listing detail page** — photo carousel with swipe gestures, author info, similar listings
+- **Create listing** — post items for sale with up to 5 photos, price, and category
+- **Favorites** — save/unsave listings synced with the backend
+- **Real-time chat** — messaging between users via WebSocket
+- **User profile** — edit personal info, upload avatar, view own listings
+- **Public seller profile** — view any seller's listings
 - **OTP verification** — email confirmation on registration
-- **Wishlist** — save liked listings (in-memory)
-- **Responsive design** — mobile-first with desktop header nav
+- **Forgot password** — OTP-based password reset flow
+- **Dark theme** — persistent dark/light mode with system preference detection
+- **Multilingual** — Russian, Kazakh, and English (react-i18next)
+- **Mobile-first** — bottom nav, safe-area support, iOS viewport fix
 
 ---
 
@@ -32,6 +39,7 @@ SDU University students lack a dedicated platform to trade items within the camp
 | Icons | Lucide React |
 | Notifications | Sonner |
 | Routing | React Router v7 |
+| i18n | react-i18next |
 
 ---
 
@@ -86,16 +94,27 @@ The app will be available at `http://localhost:5174`.
 
 ```
 src/
-├── api/              # Fetch wrappers per resource (auth.js, listings.js, users.js)
+├── api/              # Fetch wrappers (auth.js, listings.js, users.js, chat.js)
 ├── components/
-│   └── layout/       # Header (desktop), MobileNav (bottom tab bar)
+│   ├── common/       # Pagination
+│   ├── feed/         # FeedHeader, FiltersModal, FeedSkeletonLoader
+│   ├── layout/       # Header (desktop), MobileNav (bottom tab bar), Layout
+│   ├── listing/      # AuthorListings, SimilarListings
+│   ├── listings/     # ListingCard, ListingSwipe, ListingGrid, ListingList, ListingTileGrid
+│   ├── marketplace/  # SwipePagination
+│   ├── settings/     # LanguageSwitcher
+│   └── wishlist/     # EmptyState, SkeletonLoader
 ├── context/          # MarketContext — wishlist state
 ├── data/             # Category labels and constants
+├── hooks/            # useTheme, useListingNavigation, useWishlist
+├── i18n/             # i18next config + locales (ru, en, kk)
 ├── pages/
-│   ├── auth/         # AuthPage (login/register), OtpPage
-│   ├── Index.jsx     # Swipe feed
+│   ├── auth/         # AuthPage, OtpPage, ForgotPasswordPage
+│   ├── Index.jsx     # Marketplace feed
+│   ├── ListingDetails.jsx
 │   ├── AddListing.jsx
 │   ├── Profile.jsx
+│   ├── ProfileListings.jsx
 │   ├── Wishlist.jsx
 │   ├── Chat.jsx
 │   └── ChatDialog.jsx
@@ -108,14 +127,16 @@ src/
 
 ## Pages
 
-| Route | Description | Status |
-|---|---|---|
-| `/` | Swipe feed — browse all listings | Done |
-| `/add` | Create a new listing | Done |
-| `/profile` | User profile and settings | Done |
-| `/wishlist` | Saved/liked listings | Placeholder |
-| `/chat` | Messages list | Placeholder |
-| `/chat/:id` | Individual chat dialog | Placeholder |
+| Route | Description |
+|---|---|
+| `/` | Marketplace feed — gallery / list / tile / swipe |
+| `/listings/:id` | Listing detail with photo carousel |
+| `/add` | Create a new listing |
+| `/profile` | User profile and settings |
+| `/profile/:sellerId/listings` | Public seller profile |
+| `/wishlist` | Saved/favorited listings |
+| `/chat` | Conversations list |
+| `/chat/:id` | Individual chat dialog |
 
 ---
 
@@ -125,3 +146,14 @@ src/
 |---|---|---|
 | `--primary` | `#082673` | SDU Navy Blue |
 | `--accent` | `#9e2629` | SDU Red |
+
+---
+
+## Team
+
+| Student ID | Name |
+|---|---|
+| 230110056 | Aknur Buktash |
+| 230103136 | Akmaral Adilbek |
+| 230103243 | Nurmuhammed Sagyndyk |
+| 230103225 | Danial Makssatuly |
